@@ -1,5 +1,5 @@
 import mongoose, { Schema } from 'mongoose';
-import { IDocCountDocument } from '../interfaces/doc_count.interface';
+import { IDocCountDocument, ICountCategory } from '../interfaces/doc_count.interface';
 
 const DocCountSchema: Schema = new Schema(
   {
@@ -9,6 +9,7 @@ const DocCountSchema: Schema = new Schema(
     },
     category: {
       type: String,
+      enum: ICountCategory,
     },
   },
   { timestamps: true }

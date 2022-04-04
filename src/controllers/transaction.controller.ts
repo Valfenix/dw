@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import Joi from 'joi';
 import { getRepository } from 'typeorm';
 import DocCount from '../models/doc_count.model';
-import { IDocCount } from '../interfaces/doc_count.interface';
+import { IDocCount, ICountCategory } from '../interfaces/doc_count.interface';
 import { ICollectionType } from '../interfaces/collection_type.interface';
 import CollectionType from '../models/collection_type.model';
 import cron from 'node-cron';
@@ -74,7 +74,7 @@ class TransactionController {
       let checkCollectionType = await collectionTypeRepository.find();
 
       // Get previous count data from MONGO Database
-      let getCount: any = await DocCount.findOne({ category: 'collectionType' });
+      let getCount: any = await DocCount.findOne({ category: ICountCategory.COLLECTION_TYPE });
 
       // If count is not null
 
@@ -114,7 +114,7 @@ class TransactionController {
         });
         const countPayload: IDocCount = {
           count: checkCollectionType.length,
-          category: 'collection-type',
+          category: ICountCategory.COLLECTION_TYPE,
         };
         await DocCount.create(countPayload);
       }
@@ -126,7 +126,7 @@ class TransactionController {
 
 export default TransactionController;
 
-// // Bank Cron Job
-// cron.schedule('*/10 * * * * *', async () => {
-//   BankController.bankListPipeline();
-// });
+// Collection Type Cron Job
+cron.schedule('*/10 * * * * *', async () => {
+  TransactionController.collectionTypePipeline();
+});

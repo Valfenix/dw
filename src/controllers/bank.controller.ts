@@ -4,7 +4,7 @@ import { getRepository } from 'typeorm';
 import Bank from '../models/bank.model';
 import { IBank } from '../interfaces/bank.interface';
 import DocCount from '../models/doc_count.model';
-import { IDocCount } from '../interfaces/doc_count.interface';
+import { IDocCount, ICountCategory } from '../interfaces/doc_count.interface';
 import cron from 'node-cron';
 import nfs_pos_bank_list from '../Entities/nfs_pos_bank_list';
 
@@ -75,7 +75,7 @@ class BankController {
       let checkBank = await bankRepository.find();
 
       // Get previous count data from MONGO Database
-      let getCount: any = await DocCount.findOne({ category: 'bank' });
+      let getCount: any = await DocCount.findOne({ category: ICountCategory.BANK });
 
       // If count is not null
 
@@ -112,7 +112,7 @@ class BankController {
         });
         const countPayload: IDocCount = {
           count: checkBank.length,
-          category: 'bank',
+          category: ICountCategory.BANK,
         };
         await DocCount.create(countPayload);
       }
