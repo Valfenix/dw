@@ -127,6 +127,6 @@ class TransactionController {
 export default TransactionController;
 
 // Collection Type Cron Job
-cron.schedule('*/10 * * * * *', async () => {
-  TransactionController.collectionTypePipeline();
-});
+// cron.schedule('*/10 * * * * *', async () => {
+//   TransactionController.collectionTypePipeline();
+// });

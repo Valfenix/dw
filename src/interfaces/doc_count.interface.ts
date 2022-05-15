@@ -7,6 +7,8 @@ export enum ICountCategory {
   MONTHLY_SUMMARY = 'monthly_summary',
   YEARLY_SUMMARY = 'yearly_summary',
   TRANSACTIONS = 'transactions',
+  MMO_TRANSACTIONS = 'mmo_transactions',
+  MFB_TRANSACTIONS = 'mfb_transactions',
 }
 
 export interface IDocCount {

@@ -17,4 +17,4 @@ const LgaSchema: Schema = new Schema(
   { timestamps: true }
 );
 
-export default mongoose.model<ILgaDocument>('State', LgaSchema);
+export default mongoose.model<ILgaDocument>('Lga', LgaSchema);

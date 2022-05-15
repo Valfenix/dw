@@ -10,6 +10,7 @@ import config from './config/config';
 import routes from './routes/index.routes';
 
 import Logger from './lib/logger';
+import { PostgresDatabaseService } from './services/PostgreDBConnection';
 import { DatabaseService } from './services/MysqlDBConnection';
 import DatabaseMongoService from './services/MongoDBConnection';
 
@@ -38,6 +39,8 @@ const logger: any = new Logger('server', NAMESPACE);
 router.use(cors());
 
 DatabaseService.getConnection();
+
+PostgresDatabaseService.getConnection();
 
 DatabaseMongoService.MongooseService();
 

@@ -125,6 +125,6 @@ class BankController {
 export default BankController;
 
 // Bank Cron Job
-cron.schedule('*/10 * * * * *', async () => {
-  BankController.bankListPipeline();
-});
+// cron.schedule('*/5 * * * * *', async () => {
+//   BankController.bankListPipeline();
+// });
