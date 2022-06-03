@@ -9,7 +9,6 @@ const logger: any = new Logger('server', GENERAL_NAMESPACE);
 /** Generate and sign a user Token */
 const generateToken = (data: any, timeToLive: any = config.server.token.expireTime) => {
   return new Promise((resolve, _reject) => {
-    console.log(timeToLive);
     const signOptions: any = {
       issuer: `${config.server.token.issuer}`,
       subject: 'NFS-DATAWARE-HOUSE [Author: Valentine Offiah.]',
@@ -29,32 +28,32 @@ const generateToken = (data: any, timeToLive: any = config.server.token.expireTi
   });
 };
 
-const errorResponse = (
-  res: Response,
-  code: number,
-  message: string | Record<string, any>,
-  extra?: any
-) => {
-  return res.status(code).json({
-    success: false,
-    code: code,
-    message: message,
-    extra,
-  });
-};
+// const errorResponse = (
+//   res: Response,
+//   code: number,
+//   message: string | Record<string, any>,
+//   extra?: any
+// ) => {
+//   return res.status(code).json({
+//     success: false,
+//     code: code,
+//     message: message,
+//     extra,
+//   });
+// };
 
-const successResponse = (
-  res: Response,
-  code: number,
-  message: string | Record<string, any>,
-  extra?: any
-) => {
-  return res.status(code).json({
-    success: true,
-    message: message,
-    extra,
-  });
-};
+// const successResponse = (
+//   res: Response,
+//   code: number,
+//   message: string | Record<string, any>,
+//   extra?: any
+// ) => {
+//   return res.status(code).json({
+//     success: true,
+//     message: message,
+//     extra,
+//   });
+// };
 
 const convertMonthToNumber = (monthName: string) => {
   let months: any = {
@@ -77,7 +76,7 @@ const convertMonthToNumber = (monthName: string) => {
 
 export default {
   generateToken,
-  errorResponse,
-  successResponse,
+  // errorResponse,
+  // successResponse,
   convertMonthToNumber,
 };

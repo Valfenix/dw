@@ -10,7 +10,7 @@ import config from './config/config';
 import routes from './routes/index.routes';
 
 import Logger from './lib/logger';
-import { PostgresDatabaseService } from './services/PostgreDBConnection';
+// import { PostgresDatabaseService } from './services/PostgreDBConnection';
 import { DatabaseService } from './services/MysqlDBConnection';
 import DatabaseMongoService from './services/MongoDBConnection';
 
@@ -40,7 +40,7 @@ router.use(cors());
 
 DatabaseService.getConnection();
 
-PostgresDatabaseService.getConnection();
+// PostgresDatabaseService.getConnection();
 
 DatabaseMongoService.MongooseService();
 
@@ -101,3 +101,5 @@ const httpServer = http.createServer(router);
 httpServer.listen(config.server.port, () => {
   logger.info(`Server is running on ${config.server.hostname}:${config.server.port}`);
 });
+
+export default httpServer;

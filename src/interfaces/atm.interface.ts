@@ -1,10 +1,12 @@
-import { Document, ObjectId } from 'mongoose';
+import { Document } from 'mongoose';
 
 export interface IATM {
   longitude?: number;
+  latitude?: number;
   category?: string;
-  state?: ObjectId;
-  lga?: ObjectId;
+  state?: string;
+  lga?: string;
+  alias?: string;
   address?: string;
   name?: string;
   no_of_atm?: number;
@@ -15,6 +17,7 @@ export interface IATM {
   verve_accepted?: string;
   netcash_accepted?: string;
   deposit_accepted?: string;
+  key?: string;
 }
 
 export interface IATMDocument extends Document, IATM {}

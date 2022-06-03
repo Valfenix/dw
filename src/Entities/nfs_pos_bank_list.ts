@@ -6,7 +6,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
-@Entity({ name: 'nfs_pos_bank_list' })
+@Entity('nfs_pos_bank_list')
 export class nfs_pos_bank_list {
   @PrimaryGeneratedColumn()
   public id!: number;

@@ -1,6 +1,6 @@
 import { Document, ObjectId } from 'mongoose';
 
-export interface IYearlySummary {
+export interface IMonthlySummary {
   collectionType?: ObjectId;
   source_bank?: number;
   destination_bank?: number;
@@ -11,4 +11,4 @@ export interface IYearlySummary {
   volume?: number;
 }
 
-export interface IYearlySummaryDocument extends Document, IYearlySummary {}
+export interface IMonthlySummaryDocument extends Document, IMonthlySummary {}

@@ -3,6 +3,7 @@ import { ICollectionTypeDocument } from '../interfaces/collection_type.interface
 
 const CollectionTypeSchema: Schema = new Schema(
   {
+    old_id: Number,
     description: {
       type: String,
     },

@@ -1,7 +1,7 @@
 import mongoose, { Schema } from 'mongoose';
-import { IYearlySummaryDocument } from '../interfaces/yearly_summary.interface';
+import { IMonthlySummaryDocument } from '../interfaces/monthly_summary.interface';
 
-const yearlySummarySchema = new Schema(
+const monthlySummarySchema = new Schema(
   {
     collectionType: {
       type: mongoose.Schema.Types.ObjectId,
@@ -35,4 +35,4 @@ const yearlySummarySchema = new Schema(
   }
 );
 
-export default mongoose.model<IYearlySummaryDocument>('YearlySummary', yearlySummarySchema);
+export default mongoose.model<IMonthlySummaryDocument>('MonthlySummary', monthlySummarySchema);

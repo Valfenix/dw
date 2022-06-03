@@ -1,6 +1,10 @@
-import { createConnection } from 'typeorm';
+import { createConnection, createConnections } from 'typeorm';
 import { EventEmitter } from 'events';
 import nfs_pos_bank_list from '../Entities/nfs_pos_bank_list';
+import nfs_nip_bank_list from '../Entities/nfs_nip_bank_list';
+import nfs_pos from '../Entities/nfs_pos';
+import nfs_nip from '../Entities/nfs_nip';
+import DocumentStore from '../Entities/document_store';
 import collection_type from '../Entities/collection_type';
 import Logger from '../lib/logger';
 import { DATABASE_NAMESPACE } from '../config/constants';
@@ -25,19 +29,41 @@ class DatabaseService {
   }
 
   static async createConnection() {
-    return await createConnection({
-      type: 'mysql',
-      host: config.database.host,
-      username: config.database.username,
-      password: config.database.password,
-      port: config.database.port,
-      database: config.database.database,
-      synchronize: true,
-      logging: false,
-      entities: [nfs_pos_bank_list, collection_type],
-    })
+    return await createConnections([
+      {
+        name: 'MYSQL',
+        type: 'mysql',
+        // host: config.database.host,
+        // username: config.database.username,
+        // password: config.database.password,
+        // port: config.database.port,
+        // database: config.database.database,
+        // synchronize: true,
+        // logging: false,
+        host: 'localhost',
+        username: 'root',
+        password: 'Rasengan_123',
+        port: 3306,
+        database: 'utilityappdb',
+        synchronize: true,
+        logging: false,
+        entities: [nfs_pos_bank_list, nfs_nip_bank_list, collection_type, nfs_pos, nfs_nip],
+      },
+      {
+        name: 'POSTGRES',
+        type: 'postgres',
+        host: 'localhost',
+        username: 'postgres',
+        password: 'Rasengan_123',
+        port: 5432,
+        database: 'cbn',
+        synchronize: true,
+        logging: false,
+        entities: [DocumentStore],
+      },
+    ])
       .then(() => {
-        DatabaseService.logger.info('Connected to MYSQL');
+        DatabaseService.logger.info('Connected to MYSQL & POSTGRES');
       })
       .catch((_err: Error) => {
         // now do retry //

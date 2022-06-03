@@ -1,7 +1,7 @@
 import mongoose, { Schema } from 'mongoose';
-import { IYearlySummaryDocument } from '../interfaces/yearly_summary.interface';
+import { IDailySummaryDocument } from '../interfaces/daily_summary.interface';
 
-const yearlySummarySchema = new Schema(
+const dailySummarySchema = new Schema(
   {
     collectionType: {
       type: mongoose.Schema.Types.ObjectId,
@@ -31,6 +31,10 @@ const yearlySummarySchema = new Schema(
     volume: {
       type: Number,
     },
+
+    key: {
+      type: String,
+    },
   },
   {
     timestamps: true,
@@ -38,4 +42,4 @@ const yearlySummarySchema = new Schema(
   }
 );
 
-export default mongoose.model<IYearlySummaryDocument>('YearlySummary', yearlySummarySchema);
+export default mongoose.model<IDailySummaryDocument>('DailySummary', dailySummarySchema);

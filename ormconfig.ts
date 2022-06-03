@@ -1,11 +1,3 @@
-import Account from "./src/Entities/Account";
-import User from "./src/Entities/User";
-import Token from "./src/Entities/Token";
-import UserToken from "./src/Entities/UserToken";
-import Otp from "./src/Entities/Otp";
-import Roles from "./src/Entities/Roles";
-import config, { env } from "./src/config/config";
-
 module.exports = {
   // type: "mysql",
   // host: process.env.DB_HOST,
@@ -20,7 +12,6 @@ module.exports = {
   // password: "Rasengan_123",
   synchronize: true,
   logging: false,
-  entities: [Account, User, Roles, Permissions, Token, UserToken, Otp],
 
   // type: "mysql",
   // // database: "heroku_5d26481c01069d6",

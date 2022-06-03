@@ -42,6 +42,9 @@ const ATMSchema: Schema = new Schema(
       type: String,
       default: 'false',
     },
+    key: {
+      type: String,
+    },
   },
   { timestamps: true }
 );

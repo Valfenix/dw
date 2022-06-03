@@ -7,6 +7,10 @@ const StateSchema: Schema = new Schema(
       type: String,
       required: true,
     },
+    alias: {
+      type: String,
+      required: true,
+    },
     longitude: Number,
     latitude: Number,
   },
