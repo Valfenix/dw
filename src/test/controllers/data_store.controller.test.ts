@@ -664,4 +664,126 @@ describe('POST /doc_store', () => {
     await DocumentStoreController.secPipeline();
     expect(logSpy).toBeCalledWith('SEC SEEDED');
   });
+
+  /************
+   *
+   *
+   *
+   * COMPLAINT CATEGORY Pipeline
+   */
+
+  it('should create Count Document for COMPLAINT Category if missing', async () => {
+    const check = { schedule: jest.fn() };
+    const logSpy = jest.spyOn(console, 'log');
+    check.schedule.mockImplementationOnce(async (frequency, callback) => await callback());
+    await DocumentStoreController.complaintCategory();
+    expect(logSpy).toBeCalledWith('COUNT CREATED');
+  });
+
+  it('it should move COMPLAINT Category to MongoDB print a success message on the console', async () => {
+    jest.setTimeout(10000);
+    const doc_store = new DocumentStore();
+
+    doc_store.file_content = {
+      category: 'NEFT',
+      description: 'NEFT (NEFT)',
+    };
+    doc_store.business_process = 'complaint_category';
+    doc_store.creation_date = new Date();
+
+    await docStoreRepository.save(doc_store);
+
+    const check = { schedule: jest.fn() };
+    const logSpy = jest.spyOn(console, 'log');
+    check.schedule.mockImplementationOnce(async (frequency, callback) => await callback());
+    await DocumentStoreController.complaintCategory();
+    expect(logSpy).toBeCalledWith('COMPLAINT CATEGORY SEEDED');
+  });
+
+  /************
+   *
+   *
+   *
+   * COMPLAINT Pipeline
+   */
+
+  it('should create Count Document for COMPLAINT if missing', async () => {
+    const check = { schedule: jest.fn() };
+    const logSpy = jest.spyOn(console, 'log');
+    check.schedule.mockImplementationOnce(async (frequency, callback) => await callback());
+    await DocumentStoreController.complaintPipeline();
+    expect(logSpy).toBeCalledWith('COUNT CREATED');
+  });
+
+  it('it should move COMPLAINT to MongoDB print a success message on the console', async () => {
+    jest.setTimeout(10000);
+    const doc_store = new DocumentStore();
+
+    doc_store.file_content = {
+      account_currency: 'NGN',
+      amount_in_dispute: 2100,
+      branch_name: '',
+      city: '',
+      complaint_category: 'POS',
+      complaint_description: 'CUSTOMER CALLD FOR FEEDBACK ON EXISTING SR AND CALL DROPPED',
+      complaint_subject: 'POS WRONG DEBIT',
+      country: 'NG',
+      date_closed: '2018-12-17T00:00:00.000Z',
+      date_received: '2018-12-17T00:00:00.000Z',
+      tracking_reference_no: '1-2033696318541',
+      state: 'LA',
+      status: 'Ongoing',
+    };
+    doc_store.business_process = 'complaint';
+    doc_store.creation_date = new Date();
+
+    await docStoreRepository.save(doc_store);
+
+    const check = { schedule: jest.fn() };
+    const logSpy = jest.spyOn(console, 'log');
+    check.schedule.mockImplementationOnce(async (frequency, callback) => await callback());
+    await DocumentStoreController.complaintPipeline();
+    expect(logSpy).toBeCalledWith('COMPLAINT SEEDED!!!');
+  });
+
+  /************
+   *
+   *
+   *
+   * FRAUD Pipeline
+   */
+
+  it('should create Count Document for FRAUD if missing', async () => {
+    const check = { schedule: jest.fn() };
+    const logSpy = jest.spyOn(console, 'log');
+    check.schedule.mockImplementationOnce(async (frequency, callback) => await callback());
+    await DocumentStoreController.fraudPipeline();
+    expect(logSpy).toBeCalledWith('COUNT CREATED');
+  });
+
+  it('it should move FRAUD to MongoDB print a success message on the console', async () => {
+    jest.setTimeout(10000);
+    const doc_store = new DocumentStore();
+
+    doc_store.file_content = {
+      amount_involved: 5400,
+      complaint_category: 'POS',
+      date_created: '2018-12-17T00:00:00.000Z',
+      date_reported: '2018-12-17T00:00:00.000Z',
+      desc_of_transaction: 'The agent is suspected to have committed fraud',
+      agent_code: 'AA094563782',
+      status: 'Ongoing',
+      comment: '',
+    };
+    doc_store.business_process = 'fraud';
+    doc_store.creation_date = new Date();
+
+    await docStoreRepository.save(doc_store);
+
+    const check = { schedule: jest.fn() };
+    const logSpy = jest.spyOn(console, 'log');
+    check.schedule.mockImplementationOnce(async (frequency, callback) => await callback());
+    await DocumentStoreController.fraudPipeline();
+    expect(logSpy).toBeCalledWith('FRAUD SEEDED!!!');
+  });
 });

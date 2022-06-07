@@ -69,6 +69,8 @@ class TransactionController {
     const { CollectionType, TransactionDate, SourceBank, DestinationBank, Volumn, value_ } =
       req.body;
 
+    console.log(req.body);
+
     const collectionTypeSchema = Joi.object({
       CollectionType: Joi.string().required(),
       SourceBank: Joi.string().required(),
@@ -88,22 +90,11 @@ class TransactionController {
     }
 
     const transactionPosRepository = getRepository(nfs_pos, 'MYSQL');
-    let checkTransaction = await transactionPosRepository.findOne({
-      where: { CollectionType: CollectionType, TransactionDate: TransactionDate },
-    });
-
-    if (checkTransaction) {
-      return res.status(409).json({
-        success: false,
-        statusCode: 409,
-        message: 'POS Transaction exists already',
-      });
-    }
 
     const transaction = new nfs_pos();
 
     transaction.CollectionType = CollectionType;
-    transaction.TransactionDate = TransactionDate;
+    transaction.TransactionDate = new Date(TransactionDate);
     transaction.SourceBank = SourceBank;
     transaction.DestinationBank = DestinationBank;
     transaction.Volumn = Volumn;
@@ -142,17 +133,6 @@ class TransactionController {
     }
 
     const transactionNipRepository = getRepository(nfs_nip, 'MYSQL');
-    let checkTransaction = await transactionNipRepository.findOne({
-      where: { CollectionType: CollectionType, TransactionDate: TransactionDate },
-    });
-
-    if (checkTransaction) {
-      return res.status(409).json({
-        success: false,
-        statusCode: 409,
-        message: 'NIP Transaction exists already',
-      });
-    }
 
     const transaction = new nfs_nip();
 
@@ -445,6 +425,9 @@ class TransactionController {
       if (getCount) {
         // Compare last count to current document count
         if (getCount.count < checkTransaction.length) {
+          // Get data based on the time created
+          // If the time created is higher than the count doc, we proceed
+
           for (let i = 0; i < checkTransaction.length; i++) {
             let getCollectionType = await CollectionType.findOne({
               code: checkTransaction[i].CollectionType,

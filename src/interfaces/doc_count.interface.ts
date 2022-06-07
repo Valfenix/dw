@@ -23,6 +23,9 @@ export enum ICountCategory {
   SEC = 'sec',
   POS_TRANSACTION = 'pos_transaction',
   NIP_TRANSACTION = 'nip_transaction',
+  COMPLAINT_CATEGORY = 'complaint_category',
+  COMPLAINT = 'complaint',
+  FRAUD = 'fraud',
 }
 
 export interface IDocCount {

@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import cron from 'node-cron';
-import { getRepository } from 'typeorm';
+import { getRepository, MoreThan, LessThan } from 'typeorm';
 // import mongoose from 'mongoose';
 import MMOTransaction from '../models/mmo_transactions.model';
 import MFBTransaction from '../models/mfb_transactions.model';
@@ -24,6 +24,15 @@ import DevelopmentFinanceInstitution from '../models/development_finance_institu
 import MobileMoneyOperator from '../models/mmo.model';
 import BureauDeChange from '../models/bureau_de_change.model';
 import SecuritiesExchangeComm from '../models/sec.model';
+import ComplaintCategory from '../models/complaint_category.model';
+import Complaints from '../models/complaints.model';
+import DailyComplaintSummary from '../models/daily_complaint_summary.model';
+import MonthlyComplaintSummary from '../models/monthly_complaint_summary.model';
+import YearlyComplaintSummary from '../models/yearly_complaint_summary.model';
+import FraudTheftRobberies from '../models/fraud_theft_robbery.model';
+import DailyFraudSummary from '../models/daily_fraud_summary.model';
+import MonthlyFraudSummary from '../models/monthly_fraud_summary.model';
+import YearlyFraudSummary from '../models/yearly_fraud_summary.model';
 const states = require('../data/states_lga.json');
 import utils from '../lib';
 import { IBankAgents } from '../interfaces/bank_agents.interface';
@@ -36,6 +45,14 @@ import { IDfi } from '../interfaces/development_financial_institution.interface'
 import { IMmo } from '../interfaces/mmo.interface';
 import { IBdc } from '../interfaces/bureau_de_change.interface';
 import { ISec } from '../interfaces/sec.interface';
+import { IComplaintCategory } from '../interfaces/complaint_category.interface';
+import { IComplaints } from '../interfaces/complaints.interface';
+import { IDailyComplaints } from '../interfaces/daily_complaints.interface';
+import { IMonthlyComplaints } from '../interfaces/monthly_complaints.interface';
+import { IYearlyComplaints } from '../interfaces/yearly_complaints.interface';
+import { IDailyFraud } from '../interfaces/daily_fraud.interface';
+import { IFraud } from '../interfaces/fraud.interface';
+import { IMonthlyFraud } from '../interfaces/monthly_fraud.interface';
 
 class DocumentStoreController {
   public static createData = async (req: Request, res: Response) => {
@@ -970,6 +987,472 @@ class DocumentStoreController {
       console.log(err.message);
     }
   };
+
+  public static complaintCategory = async () => {
+    try {
+      const docStoreRepository = getRepository(DocumentStore, 'POSTGRES');
+
+      // Check count of documents in CBN MYSQL Database
+      let checkStore = await docStoreRepository.find({
+        business_process: BUSINESS_PROCESSES.COMPLAINT_CATEGORY,
+      });
+
+      // Get previous count data from MONGO Database
+      let getCount: any = await DocCount.findOne({
+        category: ICountCategory.COMPLAINT_CATEGORY,
+      });
+
+      // Check if count document exist
+      if (!getCount) {
+        const countPayload: IDocCount = {
+          count: 0,
+          category: ICountCategory.COMPLAINT_CATEGORY,
+        };
+        await DocCount.create(countPayload);
+        console.log('COUNT CREATED');
+      }
+
+      if (getCount) {
+        // Compare last count to current document count
+        if (getCount.count < checkStore.length) {
+          checkStore.forEach(async (e: any) => {
+            let getCategory: any = await ComplaintCategory.findOne({
+              category: e.file_content.category,
+            });
+            if (!getCategory) {
+              const complaintCategoryPayload: IComplaintCategory = {
+                category: e.file_content.category,
+                description: e.file_content.description,
+              };
+              await ComplaintCategory.create(complaintCategoryPayload);
+            }
+          });
+
+          console.log('COMPLAINT CATEGORY SEEDED');
+          // Update count
+          await DocCount.findByIdAndUpdate({ _id: getCount._id }, { count: checkStore.length });
+        }
+      }
+    } catch (err: any) {
+      console.log(err.message);
+    }
+  };
+
+  public static complaintPipeline = async () => {
+    try {
+      const docStoreRepository = getRepository(DocumentStore, 'POSTGRES');
+
+      // Check count of documents in CBN MYSQL Database
+      let checkStore: any = await docStoreRepository.find({
+        business_process: BUSINESS_PROCESSES.COMPLAINT,
+      });
+
+      // Get previous count data from MONGO Database
+      let getCount: any = await DocCount.findOne({
+        category: ICountCategory.COMPLAINT,
+      });
+
+      // Check if count document exist
+      if (!getCount) {
+        const countPayload: IDocCount = {
+          count: 0,
+          category: ICountCategory.COMPLAINT,
+        };
+        await DocCount.create(countPayload);
+        console.log('COUNT CREATED');
+      }
+
+      if (getCount) {
+        // Compare last count to current document count
+        if (getCount.count < checkStore.length) {
+          checkStore.forEach(async (e: any) => {
+            let complaintCategory = await ComplaintCategory.findOne({
+              category: e.file_content.complaint_category,
+            });
+
+            const complaintPayload: IComplaints = {
+              account_currency: e.file_content.account_currency,
+              amount_in_dispute: e.file_content.amount_in_dispute,
+              branch_name: e.file_content.branch_name,
+              city: e.file_content.city,
+              complaint_category: complaintCategory ? complaintCategory._id : null,
+              complaint_description: e.file_content.complaint_description,
+              complaint_subject: e.file_content.complaint_subject,
+              country: e.file_content.country,
+              date_closed: e.file_content.date_closed,
+              date_received: e.file_content.date_received,
+              tracking_reference_no: e.file_content.tracking_reference_no,
+              state: e.file_content.state,
+              status: e.file_content.status,
+            };
+            await Complaints.create(complaintPayload);
+          });
+
+          console.log('COMPLAINT SEEDED!');
+          // Update count
+          await DocCount.findByIdAndUpdate({ _id: getCount._id }, { count: checkStore.length });
+
+          // Get data based on the time created
+          // If the time created is higher than the count doc, we proceed
+          let checkStoreLoop: any = await docStoreRepository.find({
+            business_process: BUSINESS_PROCESSES.COMPLAINT,
+            creation_date: MoreThan(getCount.updatedAt),
+          });
+          for (let i = 0; i < checkStoreLoop.length; i++) {
+            let getCategory = await ComplaintCategory.findOne({
+              category: checkStoreLoop[i].file_content.complaint_category,
+            });
+
+            let complaintCategory = getCategory ? getCategory._id : null;
+
+            let date_received = new Date(checkStoreLoop[i].file_content.date_received);
+            let amount_in_dispute = Number(checkStoreLoop[i].file_content.amount_in_dispute);
+
+            // Daily Aggregate
+            let getDailyMatch = await DailyComplaintSummary.find({
+              $and: [
+                { day: date_received?.getDate() },
+                { month: date_received?.getMonth() + 1 },
+                { year: date_received?.getFullYear() },
+                { complaint_category: complaintCategory },
+                { status: checkStoreLoop[i].file_content.status },
+              ],
+            });
+
+            if (getDailyMatch.length == 0) {
+              const dailyComplaintPayload: IDailyComplaints = {
+                amount_in_dispute: amount_in_dispute,
+                complaint_category: complaintCategory,
+                day: String(date_received?.getDate()),
+                month: String(date_received?.getMonth() + 1),
+                year: String(date_received?.getFullYear()),
+                date_received: date_received,
+                status: checkStoreLoop[i].file_content.status,
+              };
+              await DailyComplaintSummary.create(dailyComplaintPayload);
+            } else if (getDailyMatch.length == 1) {
+              await DailyComplaintSummary.findOneAndUpdate(
+                { _id: getDailyMatch[0]._id },
+                {
+                  $set: {
+                    day: String(date_received?.getDate()),
+                    month: String(date_received?.getMonth() + 1),
+                    year: String(date_received?.getFullYear()),
+                    date_received: date_received,
+                    status: checkStoreLoop[i].file_content.status,
+                  },
+                  $inc: {
+                    amount_in_dispute: amount_in_dispute,
+                    count: 1,
+                  },
+                },
+                {
+                  new: true,
+                  upsert: true,
+                }
+              );
+            }
+
+            // Monthly Aggregate
+            let getMonthlyMatch = await MonthlyComplaintSummary.find({
+              $and: [
+                { month: date_received?.getMonth() + 1 },
+                { year: date_received?.getFullYear() },
+                { complaint_category: complaintCategory },
+                { status: checkStoreLoop[i].file_content.status },
+              ],
+            });
+
+            if (getMonthlyMatch.length == 0) {
+              const monthlyComplaintPayload: IMonthlyComplaints = {
+                amount_in_dispute: amount_in_dispute,
+                complaint_category: complaintCategory,
+                month: String(date_received?.getMonth() + 1),
+                year: String(date_received?.getFullYear()),
+                date_received: date_received,
+                status: checkStoreLoop[i].file_content.status,
+              };
+              await MonthlyComplaintSummary.create(monthlyComplaintPayload);
+            } else if (getMonthlyMatch.length == 1) {
+              await MonthlyComplaintSummary.findOneAndUpdate(
+                { _id: getMonthlyMatch[0]._id },
+                {
+                  $set: {
+                    month: String(date_received?.getMonth() + 1),
+                    year: String(date_received?.getFullYear()),
+                    date_received: date_received,
+                    status: checkStoreLoop[i].file_content.status,
+                  },
+                  $inc: {
+                    amount_in_dispute: amount_in_dispute,
+                    count: 1,
+                  },
+                },
+                {
+                  new: true,
+                  upsert: true,
+                }
+              );
+            }
+
+            // Yearly Aggregate
+            let getYearlyMatch = await YearlyComplaintSummary.find({
+              $and: [
+                { year: date_received?.getFullYear() },
+                { complaint_category: complaintCategory },
+                { status: checkStoreLoop[i].file_content.status },
+              ],
+            });
+
+            if (getYearlyMatch.length == 0) {
+              const yearlyComplaintPayload: IYearlyComplaints = {
+                amount_in_dispute: Number(checkStoreLoop[i].file_content.amount_in_dispute),
+                complaint_category: complaintCategory,
+                year: String(date_received?.getFullYear()),
+                date_received: date_received,
+                status: checkStoreLoop[i].file_content.status,
+              };
+              await YearlyComplaintSummary.create(yearlyComplaintPayload);
+            } else if (getYearlyMatch.length == 1) {
+              await YearlyComplaintSummary.findOneAndUpdate(
+                { _id: getYearlyMatch[0]._id },
+                {
+                  $set: {
+                    year: String(date_received?.getFullYear()),
+                    date_received: date_received,
+                    status: checkStoreLoop[i].file_content.status,
+                  },
+                  $inc: {
+                    amount_in_dispute: Number(checkStoreLoop[i].file_content.amount_in_dispute),
+                    count: 1,
+                  },
+                },
+                {
+                  new: true,
+                  upsert: true,
+                }
+              );
+            }
+
+            if (checkStoreLoop.length - 1 === i) {
+              console.log('COMPLAINT SEEDED!!!');
+
+              // Update count
+              await DocCount.findByIdAndUpdate({ _id: getCount._id }, { count: checkStore.length });
+            }
+          }
+        }
+      }
+    } catch (err: any) {
+      console.log(err.message);
+    }
+  };
+
+  public static fraudPipeline = async () => {
+    try {
+      const docStoreRepository = getRepository(DocumentStore, 'POSTGRES');
+
+      // Check count of documents in CBN MYSQL Database
+      let checkStore: any = await docStoreRepository.find({
+        business_process: BUSINESS_PROCESSES.FRAUD,
+      });
+
+      // Get previous count data from MONGO Database
+      let getCount: any = await DocCount.findOne({
+        category: ICountCategory.FRAUD,
+      });
+
+      // Check if count document exist
+      if (!getCount) {
+        const countPayload: IDocCount = {
+          count: 0,
+          category: ICountCategory.FRAUD,
+        };
+        await DocCount.create(countPayload);
+        console.log('COUNT CREATED');
+      }
+
+      if (getCount) {
+        // Compare last count to current document count
+        if (getCount.count < checkStore.length) {
+          checkStore.forEach(async (e: any) => {
+            let complaintCategory = await ComplaintCategory.findOne({
+              category: e.file_content.complaint_category,
+            });
+
+            const fraudPayload: IFraud = {
+              amount_involved: e.file_content.amount_involved,
+              complaint_category: complaintCategory ? complaintCategory._id : null,
+              comment: e.file_content.comment,
+              date_created: e.file_content.date_created,
+              date_reported: e.file_content.date_reported,
+              desc_of_transaction: e.file_content.desc_of_transaction,
+              agent_code: e.file_content.agent_code,
+              status: e.file_content.status,
+            };
+            await FraudTheftRobberies.create(fraudPayload);
+          });
+
+          console.log('FRAUD SEEDED!');
+          // Update count
+          await DocCount.findByIdAndUpdate({ _id: getCount._id }, { count: checkStore.length });
+
+          // Get data based on the time created
+          // If the time created is higher than the count doc, we proceed
+          let checkStoreLoop: any = await docStoreRepository.find({
+            business_process: BUSINESS_PROCESSES.FRAUD,
+            creation_date: MoreThan(getCount.updatedAt),
+          });
+          for (let i = 0; i < checkStoreLoop.length; i++) {
+            let getCategory = await ComplaintCategory.findOne({
+              category: checkStoreLoop[i].file_content.complaint_category,
+            });
+
+            let complaintCategory = getCategory ? getCategory._id : null;
+
+            let date_reported = new Date(checkStoreLoop[i].file_content.date_reported);
+            let amount_involved = Number(checkStoreLoop[i].file_content.amount_involved);
+
+            // Daily Aggregate
+            let getDailyMatch = await DailyFraudSummary.find({
+              $and: [
+                { day: date_reported?.getDate() },
+                { month: date_reported?.getMonth() + 1 },
+                { year: date_reported?.getFullYear() },
+                { complaint_category: complaintCategory },
+                { status: checkStoreLoop[i].file_content.status },
+              ],
+            });
+
+            if (getDailyMatch.length == 0) {
+              const dailyFraudPayload: IDailyFraud = {
+                amount_involved: amount_involved,
+                complaint_category: complaintCategory,
+                day: String(date_reported?.getDate()),
+                month: String(date_reported?.getMonth() + 1),
+                year: String(date_reported?.getFullYear()),
+                date_reported: date_reported,
+                status: checkStoreLoop[i].file_content.status,
+              };
+              await DailyFraudSummary.create(dailyFraudPayload);
+            } else if (getDailyMatch.length == 1) {
+              await DailyComplaintSummary.findOneAndUpdate(
+                { _id: getDailyMatch[0]._id },
+                {
+                  $set: {
+                    day: String(date_reported?.getDate()),
+                    month: String(date_reported?.getMonth() + 1),
+                    year: String(date_reported?.getFullYear()),
+                    date_received: date_reported,
+                    status: checkStoreLoop[i].file_content.status,
+                  },
+                  $inc: {
+                    amount_involved: amount_involved,
+                    count: 1,
+                  },
+                },
+                {
+                  new: true,
+                  upsert: true,
+                }
+              );
+            }
+
+            // Monthly Aggregate
+            let getMonthlyMatch = await MonthlyFraudSummary.find({
+              $and: [
+                { month: date_reported?.getMonth() + 1 },
+                { year: date_reported?.getFullYear() },
+                { complaint_category: complaintCategory },
+                { status: checkStoreLoop[i].file_content.status },
+              ],
+            });
+
+            if (getMonthlyMatch.length == 0) {
+              const monthlyFraudPayload: IMonthlyFraud = {
+                amount_involved: amount_involved,
+                complaint_category: complaintCategory,
+                month: String(date_reported?.getMonth() + 1),
+                year: String(date_reported?.getFullYear()),
+                date_reported: date_reported,
+                status: checkStoreLoop[i].file_content.status,
+              };
+              await MonthlyComplaintSummary.create(monthlyFraudPayload);
+            } else if (getMonthlyMatch.length == 1) {
+              await MonthlyComplaintSummary.findOneAndUpdate(
+                { _id: getMonthlyMatch[0]._id },
+                {
+                  $set: {
+                    day: String(date_reported?.getDate()),
+                    month: String(date_reported?.getMonth() + 1),
+                    year: String(date_reported?.getFullYear()),
+                    date_received: date_reported,
+                    status: checkStoreLoop[i].file_content.status,
+                  },
+                  $inc: {
+                    amount_involved: amount_involved,
+                    count: 1,
+                  },
+                },
+                {
+                  new: true,
+                  upsert: true,
+                }
+              );
+            }
+
+            // Yearly Aggregate
+            let getYearlyMatch = await YearlyComplaintSummary.find({
+              $and: [
+                { year: date_reported?.getFullYear() },
+                { complaint_category: complaintCategory },
+                { status: checkStoreLoop[i].file_content.status },
+              ],
+            });
+
+            if (getYearlyMatch.length == 0) {
+              const yearlyFraudPayload: IYearlyComplaints = {
+                amount_in_dispute: Number(checkStoreLoop[i].file_content.amount_in_dispute),
+                complaint_category: complaintCategory,
+                year: String(date_reported?.getFullYear()),
+                date_received: date_reported,
+                status: checkStoreLoop[i].file_content.status,
+              };
+              await YearlyComplaintSummary.create(yearlyFraudPayload);
+            } else if (getYearlyMatch.length == 1) {
+              await YearlyFraudSummary.findOneAndUpdate(
+                { _id: getYearlyMatch[0]._id },
+                {
+                  $set: {
+                    year: String(date_reported?.getFullYear()),
+                    date_received: date_reported,
+                    status: checkStoreLoop[i].file_content.status,
+                  },
+                  $inc: {
+                    amount_in_dispute: Number(checkStoreLoop[i].file_content.amount_in_dispute),
+                    count: 1,
+                  },
+                },
+                {
+                  new: true,
+                  upsert: true,
+                }
+              );
+            }
+
+            if (checkStoreLoop.length - 1 === i) {
+              console.log('FRAUD SEEDED!!!');
+
+              // Update count
+              await DocCount.findByIdAndUpdate({ _id: getCount._id }, { count: checkStore.length });
+            }
+          }
+        }
+      }
+    } catch (err: any) {
+      console.log(err.message);
+    }
+  };
 }
 
 export default DocumentStoreController;
@@ -989,4 +1472,7 @@ cron.schedule('*/5 * * * * *', async () => {
   DocumentStoreController.mmoPipeline();
   DocumentStoreController.bdcPipeline();
   DocumentStoreController.secPipeline();
+  DocumentStoreController.complaintCategory();
+  DocumentStoreController.complaintPipeline();
+  DocumentStoreController.fraudPipeline();
 });

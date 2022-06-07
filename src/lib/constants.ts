@@ -12,4 +12,7 @@ export const BUSINESS_PROCESSES = {
   MMO: 'mmo',
   BDC: 'bdc',
   SEC: 'sec',
+  COMPLAINT_CATEGORY: 'complaint_category',
+  COMPLAINT: 'complaint',
+  FRAUD: 'fraud',
 };
