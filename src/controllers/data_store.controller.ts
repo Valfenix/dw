@@ -1458,7 +1458,7 @@ class DocumentStoreController {
 export default DocumentStoreController;
 
 // Bank Cron Job
-cron.schedule('*/5 * * * * *', async () => {
+cron.schedule(String(process.env.CRON), async () => {
   DocumentStoreController.mmoTransactionPipeline();
   DocumentStoreController.mfbTransactionPipeline();
   DocumentStoreController.atmLocationsPipeline();

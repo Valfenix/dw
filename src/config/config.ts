@@ -77,13 +77,13 @@ const SERVER: IServerConfig = {
  *  DATABASE CONFIGURATIONS
  */
 
-// DB CONFIG
-const DB_USERNAME = env.isProd ? process.env.DB_USERNAME : 'root';
-const DB_PASSWORD = env.isProd ? process.env.DB_PASSWORD : 'Rasengan_123';
-const DB_DATABASE = env.isProd ? process.env.DB_DATABASE : 'utilityappdb';
-const DB_TYPE = env.isProd ? process.env.DB_TYPE : 'mysql';
-const DB_HOST = env.isProd ? process.env.DB_HOST : 'localhost';
-const DB_PORT = env.isProd ? process.env.DB_PORT : 3306;
+// MYSQL DB CONFIG
+const DB_USERNAME = process.env.DB_USERNAME;
+const DB_PASSWORD = process.env.DB_PASSWORD;
+const DB_DATABASE = process.env.DB_DATABASE;
+const DB_TYPE = process.env.DB_TYPE;
+const DB_HOST = process.env.DB_HOST;
+const DB_PORT = process.env.DB_PORT;
 
 type IDBConfigType = {
   username: string;
@@ -103,6 +103,32 @@ const DATABASE: IDBConfigType = {
   host: String(DB_HOST),
 };
 
+// POSTGRES DB CONFIG
+const POSTGRES_DB_USERNAME = process.env.POSTGRES_DB_USERNAME;
+const POSTGRES_DB_PASSWORD = process.env.POSTGRES_DB_PASSWORD;
+const POSTGRES_DB_DATABASE = process.env.POSTGRES_DB_DATABASE;
+const POSTGRES_DB_TYPE = process.env.POSTGRES_DB_TYPE;
+const POSTGRES_DB_HOST = process.env.POSTGRES_DB_HOST;
+const POSTGRES_DB_PORT = process.env.POSTGRES_DB_PORT;
+
+type IPOSTGRESDBConfigType = {
+  username: string;
+  password: string;
+  database: string;
+  port?: number;
+  type: string;
+  host: string;
+};
+
+const POSTGRES_DATABASE: IPOSTGRESDBConfigType = {
+  username: String(POSTGRES_DB_USERNAME),
+  password: String(POSTGRES_DB_PASSWORD),
+  database: String(POSTGRES_DB_DATABASE),
+  port: Number(POSTGRES_DB_PORT),
+  type: String(POSTGRES_DB_TYPE),
+  host: String(POSTGRES_DB_HOST),
+};
+
 /**
  *
  * EXPORTS
@@ -110,6 +136,7 @@ const DATABASE: IDBConfigType = {
 
 const config = {
   database: DATABASE,
+  postgres_db: POSTGRES_DATABASE,
   server: SERVER,
 };
 

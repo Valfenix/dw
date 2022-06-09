@@ -237,7 +237,7 @@ class BankController {
 export default BankController;
 
 // Bank Cron Job
-cron.schedule('*/5 * * * * *', async () => {
+cron.schedule(String(process.env.CRON), async () => {
   BankController.bankListPipelinePos();
   BankController.bankListPipelineNip();
 });

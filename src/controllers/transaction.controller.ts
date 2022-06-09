@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import Joi from 'joi';
-import { getRepository } from 'typeorm';
+import { getRepository, MoreThan } from 'typeorm';
 import DocCount from '../models/doc_count.model';
 import DailySummary from '../models/daily_summary';
 import MonthlySummary from '../models/monthly_summary';
@@ -239,34 +239,40 @@ class TransactionController {
       if (getCount) {
         // Compare last count to current document count
         if (getCount.count < checkTransaction.length) {
-          for (let i = 0; i < checkTransaction.length; i++) {
+          // Get data based on the time created
+          // If the time created is higher than the count doc, we proceed
+
+          let checkStoreLoop: any = await transactionPosRepository.find({
+            createdAt: MoreThan(getCount.updatedAt),
+          });
+          for (let i = 0; i < checkStoreLoop.length; i++) {
             let getCollectionType = await CollectionType.findOne({
-              code: checkTransaction[i].CollectionType,
+              code: checkStoreLoop[i].CollectionType,
             });
             let collection_id = getCollectionType ? getCollectionType._id : null;
 
             // Daily Aggregate
             let getDailyMatch = await DailySummary.find({
               $and: [
-                { day: checkTransaction[i].TransactionDate?.getDate() },
-                { month: checkTransaction[i].TransactionDate?.getMonth() + 1 },
-                { year: checkTransaction[i].TransactionDate?.getFullYear() },
+                { day: checkStoreLoop[i].TransactionDate?.getDate() },
+                { month: checkStoreLoop[i].TransactionDate?.getMonth() + 1 },
+                { year: checkStoreLoop[i].TransactionDate?.getFullYear() },
                 { collectionType: collection_id },
-                { destination_bank: checkTransaction[i].DestinationBank },
+                { destination_bank: checkStoreLoop[i].DestinationBank },
               ],
             });
 
             if (getDailyMatch.length == 0) {
               const dailyTransactionPayload: IDailySummary = {
                 collectionType: collection_id,
-                source_bank: Number(checkTransaction[i].SourceBank),
-                destination_bank: Number(checkTransaction[i].DestinationBank),
-                transactionDate: checkTransaction[i].TransactionDate,
-                day: String(checkTransaction[i].TransactionDate?.getDate()),
-                month: String(checkTransaction[i].TransactionDate?.getMonth() + 1),
-                year: String(checkTransaction[i].TransactionDate?.getFullYear()),
-                value: checkTransaction[i].value_,
-                volume: checkTransaction[i].Volumn,
+                source_bank: Number(checkStoreLoop[i].SourceBank),
+                destination_bank: Number(checkStoreLoop[i].DestinationBank),
+                transactionDate: checkStoreLoop[i].TransactionDate,
+                day: String(checkStoreLoop[i].TransactionDate?.getDate()),
+                month: String(checkStoreLoop[i].TransactionDate?.getMonth() + 1),
+                year: String(checkStoreLoop[i].TransactionDate?.getFullYear()),
+                value: checkStoreLoop[i].value_,
+                volume: checkStoreLoop[i].Volumn,
               };
               await DailySummary.create(dailyTransactionPayload);
             } else if (getDailyMatch.length == 1) {
@@ -274,17 +280,17 @@ class TransactionController {
                 { _id: getDailyMatch[0]._id },
                 {
                   $set: {
-                    source_bank: checkTransaction[i].SourceBank,
+                    source_bank: checkStoreLoop[i].SourceBank,
                     destination_bank: getDailyMatch[0].destination_bank,
                     collectionType: getDailyMatch[0].collectionType,
                     day: getDailyMatch[0].day,
                     month: getDailyMatch[0].month,
                     year: getDailyMatch[0].year,
-                    transactionDate: checkTransaction[i].TransactionDate,
+                    transactionDate: checkStoreLoop[i].TransactionDate,
                   },
                   $inc: {
-                    volume: checkTransaction[i].Volumn,
-                    value: checkTransaction[i].value_,
+                    volume: checkStoreLoop[i].Volumn,
+                    value: checkStoreLoop[i].value_,
                   },
                 },
                 {
@@ -297,23 +303,23 @@ class TransactionController {
             // Monthly Aggregate
             let getMonthlyMatch = await MonthlySummary.find({
               $and: [
-                { month: checkTransaction[i].TransactionDate?.getMonth() + 1 },
-                { year: checkTransaction[i].TransactionDate?.getFullYear() },
+                { month: checkStoreLoop[i].TransactionDate?.getMonth() + 1 },
+                { year: checkStoreLoop[i].TransactionDate?.getFullYear() },
                 { collectionType: collection_id },
-                { destination_bank: checkTransaction[i].DestinationBank },
+                { destination_bank: checkStoreLoop[i].DestinationBank },
               ],
             });
 
             if (getMonthlyMatch.length == 0) {
               const monthlyTransactionPayload: IMonthlySummary = {
                 collectionType: collection_id,
-                source_bank: Number(checkTransaction[i].SourceBank),
-                destination_bank: Number(checkTransaction[i].DestinationBank),
-                transactionDate: checkTransaction[i].TransactionDate,
-                month: String(checkTransaction[i].TransactionDate?.getMonth() + 1),
-                year: String(checkTransaction[i].TransactionDate?.getFullYear()),
-                value: checkTransaction[i].value_,
-                volume: checkTransaction[i].Volumn,
+                source_bank: Number(checkStoreLoop[i].SourceBank),
+                destination_bank: Number(checkStoreLoop[i].DestinationBank),
+                transactionDate: checkStoreLoop[i].TransactionDate,
+                month: String(checkStoreLoop[i].TransactionDate?.getMonth() + 1),
+                year: String(checkStoreLoop[i].TransactionDate?.getFullYear()),
+                value: checkStoreLoop[i].value_,
+                volume: checkStoreLoop[i].Volumn,
               };
               await MonthlySummary.create(monthlyTransactionPayload);
             } else if (getMonthlyMatch.length == 1) {
@@ -321,16 +327,16 @@ class TransactionController {
                 { _id: getMonthlyMatch[0]._id },
                 {
                   $set: {
-                    source_bank: checkTransaction[i].SourceBank,
+                    source_bank: checkStoreLoop[i].SourceBank,
                     destination_bank: getMonthlyMatch[0].destination_bank,
                     collectionType: getMonthlyMatch[0].collectionType,
                     month: getMonthlyMatch[0].month,
                     year: getMonthlyMatch[0].year,
-                    transactionDate: checkTransaction[i].TransactionDate,
+                    transactionDate: checkStoreLoop[i].TransactionDate,
                   },
                   $inc: {
-                    volume: checkTransaction[i].Volumn,
-                    value: checkTransaction[i].value_,
+                    volume: checkStoreLoop[i].Volumn,
+                    value: checkStoreLoop[i].value_,
                   },
                 },
                 {
@@ -343,21 +349,21 @@ class TransactionController {
             // Yearly Aggregate
             let getYearlyMatch = await YearlySummary.find({
               $and: [
-                { year: checkTransaction[i].TransactionDate?.getFullYear() },
+                { year: checkStoreLoop[i].TransactionDate?.getFullYear() },
                 { collectionType: collection_id },
-                { destination_bank: checkTransaction[i].DestinationBank },
+                { destination_bank: checkStoreLoop[i].DestinationBank },
               ],
             });
 
             if (getYearlyMatch.length == 0) {
               const yearlyTransactionPayload: IYearlySummary = {
                 collectionType: collection_id,
-                source_bank: Number(checkTransaction[i].SourceBank),
-                destination_bank: Number(checkTransaction[i].DestinationBank),
-                transactionDate: checkTransaction[i].TransactionDate,
-                year: String(checkTransaction[i].TransactionDate?.getFullYear()),
-                value: checkTransaction[i].value_,
-                volume: checkTransaction[i].Volumn,
+                source_bank: Number(checkStoreLoop[i].SourceBank),
+                destination_bank: Number(checkStoreLoop[i].DestinationBank),
+                transactionDate: checkStoreLoop[i].TransactionDate,
+                year: String(checkStoreLoop[i].TransactionDate?.getFullYear()),
+                value: checkStoreLoop[i].value_,
+                volume: checkStoreLoop[i].Volumn,
               };
               await YearlySummary.create(yearlyTransactionPayload);
             } else if (getYearlyMatch.length == 1) {
@@ -365,15 +371,15 @@ class TransactionController {
                 { _id: getYearlyMatch[0]._id },
                 {
                   $set: {
-                    source_bank: checkTransaction[i].SourceBank,
+                    source_bank: checkStoreLoop[i].SourceBank,
                     destination_bank: getYearlyMatch[0].destination_bank,
                     collectionType: getYearlyMatch[0].collectionType,
                     year: getYearlyMatch[0].year,
-                    transactionDate: checkTransaction[i].TransactionDate,
+                    transactionDate: checkStoreLoop[i].TransactionDate,
                   },
                   $inc: {
-                    volume: checkTransaction[i].Volumn,
-                    value: checkTransaction[i].value_,
+                    volume: checkStoreLoop[i].Volumn,
+                    value: checkStoreLoop[i].value_,
                   },
                 },
                 {
@@ -383,7 +389,7 @@ class TransactionController {
               );
             }
 
-            if (checkTransaction.length - 1 === i) {
+            if (checkStoreLoop.length - 1 === i) {
               console.log('POS SUMMARY SEEDED');
 
               // Update count
@@ -428,34 +434,37 @@ class TransactionController {
           // Get data based on the time created
           // If the time created is higher than the count doc, we proceed
 
-          for (let i = 0; i < checkTransaction.length; i++) {
+          let checkStoreLoop: any = await transactionNipRepository.find({
+            createdAt: MoreThan(getCount.updatedAt),
+          });
+          for (let i = 0; i < checkStoreLoop.length; i++) {
             let getCollectionType = await CollectionType.findOne({
-              code: checkTransaction[i].CollectionType,
+              code: checkStoreLoop[i].CollectionType,
             });
             let collection_id = getCollectionType ? getCollectionType._id : null;
 
             // Daily Aggregate
             let getDailyMatch = await DailySummary.find({
               $and: [
-                { day: checkTransaction[i].TransactionDate?.getDate() },
-                { month: checkTransaction[i].TransactionDate?.getMonth() + 1 },
-                { year: checkTransaction[i].TransactionDate?.getFullYear() },
+                { day: checkStoreLoop[i].TransactionDate?.getDate() },
+                { month: checkStoreLoop[i].TransactionDate?.getMonth() + 1 },
+                { year: checkStoreLoop[i].TransactionDate?.getFullYear() },
                 { collectionType: collection_id },
-                { destination_bank: checkTransaction[i].DestinationBank },
+                { destination_bank: checkStoreLoop[i].DestinationBank },
               ],
             });
 
             if (getDailyMatch.length == 0) {
               const dailyTransactionPayload: IDailySummary = {
                 collectionType: collection_id,
-                source_bank: Number(checkTransaction[i].SourceBank),
-                destination_bank: Number(checkTransaction[i].DestinationBank),
-                transactionDate: checkTransaction[i].TransactionDate,
-                day: String(checkTransaction[i].TransactionDate?.getDate()),
-                month: String(checkTransaction[i].TransactionDate?.getMonth() + 1),
-                year: String(checkTransaction[i].TransactionDate?.getFullYear()),
-                value: checkTransaction[i].value_,
-                volume: checkTransaction[i].Volumn,
+                source_bank: Number(checkStoreLoop[i].SourceBank),
+                destination_bank: Number(checkStoreLoop[i].DestinationBank),
+                transactionDate: checkStoreLoop[i].TransactionDate,
+                day: String(checkStoreLoop[i].TransactionDate?.getDate()),
+                month: String(checkStoreLoop[i].TransactionDate?.getMonth() + 1),
+                year: String(checkStoreLoop[i].TransactionDate?.getFullYear()),
+                value: checkStoreLoop[i].value_,
+                volume: checkStoreLoop[i].Volumn,
               };
               await DailySummary.create(dailyTransactionPayload);
             } else if (getDailyMatch.length == 1) {
@@ -463,17 +472,17 @@ class TransactionController {
                 { _id: getDailyMatch[0]._id },
                 {
                   $set: {
-                    source_bank: checkTransaction[i].SourceBank,
+                    source_bank: checkStoreLoop[i].SourceBank,
                     destination_bank: getDailyMatch[0].destination_bank,
                     collectionType: getDailyMatch[0].collectionType,
                     day: getDailyMatch[0].day,
                     month: getDailyMatch[0].month,
                     year: getDailyMatch[0].year,
-                    transactionDate: checkTransaction[i].TransactionDate,
+                    transactionDate: checkStoreLoop[i].TransactionDate,
                   },
                   $inc: {
-                    volume: checkTransaction[i].Volumn,
-                    value: checkTransaction[i].value_,
+                    volume: checkStoreLoop[i].Volumn,
+                    value: checkStoreLoop[i].value_,
                   },
                 },
                 {
@@ -486,23 +495,23 @@ class TransactionController {
             // Monthly Aggregate
             let getMonthlyMatch = await MonthlySummary.find({
               $and: [
-                { month: checkTransaction[i].TransactionDate?.getMonth() + 1 },
-                { year: checkTransaction[i].TransactionDate?.getFullYear() },
+                { month: checkStoreLoop[i].TransactionDate?.getMonth() + 1 },
+                { year: checkStoreLoop[i].TransactionDate?.getFullYear() },
                 { collectionType: collection_id },
-                { destination_bank: checkTransaction[i].DestinationBank },
+                { destination_bank: checkStoreLoop[i].DestinationBank },
               ],
             });
 
             if (getMonthlyMatch.length == 0) {
               const monthlyTransactionPayload: IMonthlySummary = {
                 collectionType: collection_id,
-                source_bank: Number(checkTransaction[i].SourceBank),
-                destination_bank: Number(checkTransaction[i].DestinationBank),
-                transactionDate: checkTransaction[i].TransactionDate,
-                month: String(checkTransaction[i].TransactionDate?.getMonth() + 1),
-                year: String(checkTransaction[i].TransactionDate?.getFullYear()),
-                value: checkTransaction[i].value_,
-                volume: checkTransaction[i].Volumn,
+                source_bank: Number(checkStoreLoop[i].SourceBank),
+                destination_bank: Number(checkStoreLoop[i].DestinationBank),
+                transactionDate: checkStoreLoop[i].TransactionDate,
+                month: String(checkStoreLoop[i].TransactionDate?.getMonth() + 1),
+                year: String(checkStoreLoop[i].TransactionDate?.getFullYear()),
+                value: checkStoreLoop[i].value_,
+                volume: checkStoreLoop[i].Volumn,
               };
               await MonthlySummary.create(monthlyTransactionPayload);
             } else if (getMonthlyMatch.length == 1) {
@@ -510,16 +519,16 @@ class TransactionController {
                 { _id: getMonthlyMatch[0]._id },
                 {
                   $set: {
-                    source_bank: checkTransaction[i].SourceBank,
+                    source_bank: checkStoreLoop[i].SourceBank,
                     destination_bank: getMonthlyMatch[0].destination_bank,
                     collectionType: getMonthlyMatch[0].collectionType,
                     month: getMonthlyMatch[0].month,
                     year: getMonthlyMatch[0].year,
-                    transactionDate: checkTransaction[i].TransactionDate,
+                    transactionDate: checkStoreLoop[i].TransactionDate,
                   },
                   $inc: {
-                    volume: checkTransaction[i].Volumn,
-                    value: checkTransaction[i].value_,
+                    volume: checkStoreLoop[i].Volumn,
+                    value: checkStoreLoop[i].value_,
                   },
                 },
                 {
@@ -532,21 +541,21 @@ class TransactionController {
             // Yearly Aggregate
             let getYearlyMatch = await YearlySummary.find({
               $and: [
-                { year: checkTransaction[i].TransactionDate?.getFullYear() },
+                { year: checkStoreLoop[i].TransactionDate?.getFullYear() },
                 { collectionType: collection_id },
-                { destination_bank: checkTransaction[i].DestinationBank },
+                { destination_bank: checkStoreLoop[i].DestinationBank },
               ],
             });
 
             if (getYearlyMatch.length == 0) {
               const yearlyTransactionPayload: IYearlySummary = {
                 collectionType: collection_id,
-                source_bank: Number(checkTransaction[i].SourceBank),
-                destination_bank: Number(checkTransaction[i].DestinationBank),
-                transactionDate: checkTransaction[i].TransactionDate,
-                year: String(checkTransaction[i].TransactionDate?.getFullYear()),
-                value: checkTransaction[i].value_,
-                volume: checkTransaction[i].Volumn,
+                source_bank: Number(checkStoreLoop[i].SourceBank),
+                destination_bank: Number(checkStoreLoop[i].DestinationBank),
+                transactionDate: checkStoreLoop[i].TransactionDate,
+                year: String(checkStoreLoop[i].TransactionDate?.getFullYear()),
+                value: checkStoreLoop[i].value_,
+                volume: checkStoreLoop[i].Volumn,
               };
               await YearlySummary.create(yearlyTransactionPayload);
             } else if (getYearlyMatch.length == 1) {
@@ -554,15 +563,15 @@ class TransactionController {
                 { _id: getYearlyMatch[0]._id },
                 {
                   $set: {
-                    source_bank: checkTransaction[i].SourceBank,
+                    source_bank: checkStoreLoop[i].SourceBank,
                     destination_bank: getYearlyMatch[0].destination_bank,
                     collectionType: getYearlyMatch[0].collectionType,
                     year: getYearlyMatch[0].year,
-                    transactionDate: checkTransaction[i].TransactionDate,
+                    transactionDate: checkStoreLoop[i].TransactionDate,
                   },
                   $inc: {
-                    volume: checkTransaction[i].Volumn,
-                    value: checkTransaction[i].value_,
+                    volume: checkStoreLoop[i].Volumn,
+                    value: checkStoreLoop[i].value_,
                   },
                 },
                 {
@@ -572,7 +581,7 @@ class TransactionController {
               );
             }
 
-            if (checkTransaction.length - 1 === i) {
+            if (checkStoreLoop.length - 1 === i) {
               console.log('NIP SUMMARY SEEDED');
 
               // Update count
@@ -593,7 +602,8 @@ class TransactionController {
 export default TransactionController;
 
 // Collection Type Cron Job
-cron.schedule('*/10 * * * * *', async () => {
+cron.schedule(String(process.env.CRON), async () => {
   TransactionController.posTransactionPipeline();
+  TransactionController.nipTransactionPipeline();
   TransactionController.collectionTypePipeline();
 });
