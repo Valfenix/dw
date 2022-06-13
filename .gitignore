@@ -8,6 +8,6 @@ node_modules
 /.nyc_output/**
 /coverage
 /coverage/**
-/tests
-/tests/**
-tests/**
+# /tests
+# /tests/**
+# tests/**
