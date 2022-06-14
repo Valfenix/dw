@@ -1,0 +1,48 @@
+image: node:14.15.4
+
+clone:
+  depth: full # SonarCloud scanner needs the full history to assign issues properly
+
+options:
+  docker: true
+  size: 2x
+
+definitions:
+  services:
+    docker:
+      memory: 4096
+  caches:
+    sonar: ~/.sonar/cache # Caching SonarCloud artifacts will speed up your
+
+  steps:
+    - step: &build-test-sonarcloud
+        name: Build, test and analyze on SonarCloud
+        caches:
+          - sonar
+        script:
+          - export TZ='Africa/Lagos'
+          - export NODE_OPTIONS="--unhandled-rejections=none"
+          # - npm install --quiet
+          # - npm run report\
+          - pipe: sonarsource/sonarcloud-scan:1.2.1
+            variables:
+              EXTRA_ARGS: -Dsonar.javascript.node.maxspace=8192 -Dsonar.coverage.exclusions="*/node_modules/,/.test.js,*/.test.tsx,/jest.setup.js,/.d.ts,*/.next/,/.data/,/public/,/coverage/,/jest.config.js,/logger.config.ts,/less-styles-script.js,/tailwind.config.js,/styles/,/_mocks_/,/config/,/next.config.js,*/postcss.config.js,**/*.xml"
+
+        services:
+          - docker
+        size: 2x
+
+    - step: &check-quality-gate-sonarcloud
+        name: Check the Quality Gate on SonarCloud
+        script:
+          - pipe: sonarsource/sonarcloud-quality-gate:0.1.4
+
+pipelines: # More info here: https://confluence.atlassian.com/bitbucket/configure-bitbucket-pipelines-yml-792298910.html
+  branches:
+    master:
+      - step: *build-test-sonarcloud
+      # - step: *check-quality-gate-sonarcloud
+  pull-requests:
+    '**':
+      - step: *build-test-sonarcloud
+      - step: *check-quality-gate-sonarcloud
