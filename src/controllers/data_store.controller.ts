@@ -33,7 +33,7 @@ import FraudTheftRobberies from '../models/fraud_theft_robbery.model';
 import DailyFraudSummary from '../models/daily_fraud_summary.model';
 import MonthlyFraudSummary from '../models/monthly_fraud_summary.model';
 import YearlyFraudSummary from '../models/yearly_fraud_summary.model';
-const states = require('../data/states_lga.json');
+import { states } from './states_lga';
 import utils from '../lib';
 import { IBankAgents } from '../interfaces/bank_agents.interface';
 import { IPFA } from '../interfaces/pension_fund_admin.interface';
@@ -91,7 +91,7 @@ class DocumentStoreController {
               await Lga.create(...lgas);
               console.log(`Lgas for ${x.state} created`);
             } else {
-              console.log("States and LGA's seeded");
+              console.log("States and LGA's seeded already");
             }
           } catch (err: any) {
             console.log(err.message);
@@ -1457,8 +1457,8 @@ class DocumentStoreController {
 
 export default DocumentStoreController;
 
-// Bank Cron Job
 cron.schedule(String(process.env.CRON), async () => {
+  DocumentStoreController.statesLga();
   DocumentStoreController.mmoTransactionPipeline();
   DocumentStoreController.mfbTransactionPipeline();
   DocumentStoreController.atmLocationsPipeline();

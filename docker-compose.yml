@@ -1,0 +1,42 @@
+version: '3'
+services:
+  nfsmaps:
+    container_name: nfsdatawarehouse
+    restart: always
+    build: .
+    ports:
+      - '1228:1228'
+    links:
+      - mongo
+      - mysql
+      - postgres
+  mongo:
+    container_name: nfsmaps-mongo
+    image: 'mongo:5'
+    ports: 
+      - '27017:27017'
+  # mysql
+  mysql:
+    image: "mysql:5.7.37"
+    container_name: "typeorm-mysql"
+    ports:
+      - "3306:3306"
+    environment:
+      DB_HOST: "localhost"
+      DB_USERNAME: "root"
+      DB_PASSWORD: "Rasengan_123"
+      DB_DATABASE: "utilityappdb"
+
+   # postgres
+  postgres:
+    image: "mdillon/postgis:9.6"
+    container_name: "typeorm-postgres"
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB_USERNAME: "postgres" 
+      POSTGRES_DB_PASSWORD: "Rasengan_123" 
+      POSTGRES_DB_DATABASE: "cbn"  
+      POSTGRES_DB_TYPE: "postgres" 
+      POSTGRES_DB_HOST: "localhost"  
+      

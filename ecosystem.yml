@@ -1,0 +1,4 @@
+apps:
+  - name: 'nfs-datawarehouse'
+    script: './build/index.js'
+    kill_timeout: 10000
