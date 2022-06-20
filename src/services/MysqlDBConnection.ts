@@ -1,4 +1,4 @@
-import { createConnection, createConnections } from 'typeorm';
+import { createConnections } from 'typeorm';
 import { EventEmitter } from 'events';
 import nfs_pos_bank_list from '../Entities/nfs_pos_bank_list';
 import nfs_nip_bank_list from '../Entities/nfs_nip_bank_list';
@@ -24,7 +24,7 @@ class DatabaseService {
       DatabaseService.logger.error('Database connection error... Retrying...');
       setTimeout(async () => {
         await DatabaseService.createConnection();
-      }, 5000);
+      }, 10000);
     });
   }
 

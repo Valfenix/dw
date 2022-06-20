@@ -79,8 +79,8 @@ const SERVER: IServerConfig = {
 
 // MYSQL DB CONFIG
 const DB_USERNAME = process.env.DB_USERNAME;
-const DB_PASSWORD = process.env.DB_PASSWORD;
-const DB_DATABASE = process.env.DB_DATABASE;
+const DB_PASSWORD = process.env.MYSQL_PASSWORD;
+const DB_DATABASE = process.env.MYSQL_DATABASE;
 const DB_TYPE = process.env.DB_TYPE;
 const DB_HOST = process.env.DB_HOST;
 const DB_PORT = process.env.DB_PORT;
@@ -104,9 +104,9 @@ const DATABASE: IDBConfigType = {
 };
 
 // POSTGRES DB CONFIG
-const POSTGRES_DB_USERNAME = process.env.POSTGRES_DB_USERNAME;
-const POSTGRES_DB_PASSWORD = process.env.POSTGRES_DB_PASSWORD;
-const POSTGRES_DB_DATABASE = process.env.POSTGRES_DB_DATABASE;
+const POSTGRES_DB_USERNAME = process.env.POSTGRES_USER;
+const POSTGRES_DB_PASSWORD = process.env.POSTGRES_PASSWORD;
+const POSTGRES_DB_DATABASE = process.env.POSTGRES_DB;
 const POSTGRES_DB_TYPE = process.env.POSTGRES_DB_TYPE;
 const POSTGRES_DB_HOST = process.env.POSTGRES_DB_HOST;
 const POSTGRES_DB_PORT = process.env.POSTGRES_DB_PORT;

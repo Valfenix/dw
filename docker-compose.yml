@@ -22,10 +22,10 @@ services:
     ports:
       - "3306:3306"
     environment:
-      DB_HOST: "localhost"
-      DB_USERNAME: "root"
-      DB_PASSWORD: "Rasengan_123"
-      DB_DATABASE: "utilityappdb"
+      MYSQL_ROOT_PASSWORD: "Rasengan_123"
+      MYSQL_PASSWORD: "Rasengan_123"
+      MYSQL_DATABASE: "utilityappdb"
+
 
    # postgres
   postgres:
@@ -34,9 +34,7 @@ services:
     ports:
       - "5432:5432"
     environment:
-      POSTGRES_DB_USERNAME: "postgres" 
-      POSTGRES_DB_PASSWORD: "Rasengan_123" 
-      POSTGRES_DB_DATABASE: "cbn"  
-      POSTGRES_DB_TYPE: "postgres" 
-      POSTGRES_DB_HOST: "localhost"  
+      POSTGRES_PASSWORD: "Rasengan_123"
+      POSTGRES_USER: "postgres"
+      POSTGRES_DB: "cbn"
       

@@ -10,7 +10,7 @@ RUN npm run tsc
 FROM node:12.17.0-alpine
 WORKDIR /var/www/nfsdatawarehouse
 COPY package.json ./
-RUN npm install --only=production
+RUN npm install
 COPY --from=0 /var/www/nfsdatawarehouse/build .
 RUN npm install pm2 -g
 COPY .env.docker ./.env

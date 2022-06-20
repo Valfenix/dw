@@ -1458,7 +1458,7 @@ class DocumentStoreController {
 export default DocumentStoreController;
 
 cron.schedule(String(process.env.CRON), async () => {
-  DocumentStoreController.statesLga();
+  // DocumentStoreController.statesLga();
   DocumentStoreController.mmoTransactionPipeline();
   DocumentStoreController.mfbTransactionPipeline();
   DocumentStoreController.atmLocationsPipeline();
