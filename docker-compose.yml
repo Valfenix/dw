@@ -1,6 +1,6 @@
-version: '3'
+version: '3.5'
 services:
-  nfsmaps:
+  nfsmaps-datawarehouse:
     container_name: nfsdatawarehouse
     restart: always
     build: .
@@ -10,6 +10,8 @@ services:
       - mongo
       - mysql
       - postgres
+    # environment:
+    #   - NODE_ENV=prod
   mongo:
     container_name: nfsmaps-mongo
     image: 'mongo:5'
@@ -19,12 +21,17 @@ services:
   mysql:
     image: "mysql:5.7.37"
     container_name: "typeorm-mysql"
+    environment:
+      - MYSQL_ROOT_HOST=%
+      - MYSQL_ROOT_PASSWORD=Rasengan_123
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
     ports:
       - "3306:3306"
-    environment:
-      MYSQL_ROOT_PASSWORD: "Rasengan_123"
-      MYSQL_PASSWORD: "Rasengan_123"
-      MYSQL_DATABASE: "utilityappdb"
+    env_file:
+      - .env
+    networks:
+      - mysql
 
 
    # postgres
@@ -32,9 +39,16 @@ services:
     image: "mdillon/postgis:9.6"
     container_name: "typeorm-postgres"
     ports:
-      - "5432:5432"
-    environment:
-      POSTGRES_PASSWORD: "Rasengan_123"
-      POSTGRES_USER: "postgres"
-      POSTGRES_DB: "cbn"
+      - "5431:5432"
+    env_file:
+      - .env
+    # environment:
+      # POSTGRES_DB_PASSWORD: "Rasengan_123"
+
+networks:
+  external-net:
+    external:
+      name: external-net
+  mysql:
+    driver: bridge
       

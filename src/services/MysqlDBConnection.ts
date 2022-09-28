@@ -33,32 +33,57 @@ class DatabaseService {
       {
         name: 'MYSQL',
         type: 'mysql',
-        host: config.database.host,
-        username: config.database.username,
-        password: config.database.password,
-        port: config.database.port,
-        database: config.database.database,
-        synchronize: true,
+        host: String(process.env.DB_HOST),
+        username: String(process.env.DB_USERNAME),
+        password: String(process.env.DB_PASSWORD),
+        port: Number(process.env.DB_PORT),
+        database: String(process.env.DB_DATABASE),
+        synchronize: false,
         logging: false,
         entities: [nfs_pos_bank_list, nfs_nip_bank_list, collection_type, nfs_pos, nfs_nip],
       },
       {
         name: 'POSTGRES',
         type: 'postgres',
-        host: config.postgres_db.host,
-        username: config.postgres_db.username,
-        password: config.postgres_db.password,
-        port: config.postgres_db.port,
-        database: config.postgres_db.database,
-        synchronize: true,
+        host: String(process.env.POSTGRES_DB_HOST),
+        username: String(process.env.POSTGRES_DB_USERNAME),
+        password: String(process.env.POSTGRES_DB_PASSWORD),
+        port: Number(process.env.POSTGRES_DB_PORT),
+        database: String(process.env.POSTGRES_DB_DATABASE),
+        synchronize: false,
         logging: false,
         entities: [DocumentStore],
       },
+      // {
+      //   name: 'MYSQL',
+      //   type: 'mysql',
+      //   host: String('localhost'),
+      //   username: String('root'),
+      //   password: String('Rasengan_123'),
+      //   port: Number(3306),
+      //   database: String('utilityappdb'),
+      //   synchronize: true,
+      //   logging: true,
+      //   entities: [nfs_pos_bank_list, nfs_nip_bank_list, collection_type, nfs_pos, nfs_nip],
+      // },
+      // {
+      //   name: 'POSTGRES',
+      //   type: 'postgres',
+      //   host: String('localhost'),
+      //   username: String('postgres'),
+      //   password: String('Rasengan_123'),
+      //   port: Number(5432),
+      //   database: String('cbn'),
+      //   synchronize: true,
+      //   logging: true,
+      //   entities: [DocumentStore],
+      // },
     ])
       .then(() => {
         DatabaseService.logger.info('Connected to MYSQL & POSTGRES');
       })
       .catch((_err: Error) => {
+        console.log(_err);
         // now do retry //
         DatabaseService.logger.error('Database connection error... Retrying...');
         DatabaseService.Emitter.emit('DB_CONN_ERROR');

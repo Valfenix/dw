@@ -1,0 +1,32 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.ICountCategory = void 0;
+var ICountCategory;
+(function (ICountCategory) {
+    ICountCategory["BANK_POS"] = "bank_pos";
+    ICountCategory["BANK_NIP"] = "bank_nip";
+    ICountCategory["COLLECTION_TYPE"] = "collection_type";
+    ICountCategory["DAILY_SUMMARY"] = "daily_summary";
+    ICountCategory["MONTHLY_SUMMARY"] = "monthly_summary";
+    ICountCategory["YEARLY_SUMMARY"] = "yearly_summary";
+    ICountCategory["TRANSACTIONS"] = "transactions";
+    ICountCategory["MMO_TRANSACTIONS"] = "mmo_transactions";
+    ICountCategory["MFB_TRANSACTIONS"] = "mfb_transactions";
+    ICountCategory["ATM_LOCATIONS"] = "atm_locations";
+    ICountCategory["BANK_AGENTS_LOCATIONS"] = "bank_agents_locations";
+    ICountCategory["PENSION_FUND_ADMIN"] = "pension_fund_admin";
+    ICountCategory["INSURANCE"] = "insurance";
+    ICountCategory["MFB_LOCATIONS"] = "mfb_locations";
+    ICountCategory["CMB_LOCATIONS"] = "cmb_locations";
+    ICountCategory["MORTGAGE_BANKS"] = "mortgage_banks";
+    ICountCategory["DEVELOPMENT_FINANCE_INSTITUTION"] = "development_finance_institution";
+    ICountCategory["MMO"] = "mmo";
+    ICountCategory["BDC"] = "bdc";
+    ICountCategory["SEC"] = "sec";
+    ICountCategory["POS_TRANSACTION"] = "pos_transaction";
+    ICountCategory["NIP_TRANSACTION"] = "nip_transaction";
+    ICountCategory["COMPLAINT_CATEGORY"] = "complaint_category";
+    ICountCategory["COMPLAINT"] = "complaint";
+    ICountCategory["FRAUD"] = "fraud";
+})(ICountCategory = exports.ICountCategory || (exports.ICountCategory = {}));
+//# sourceMappingURL=doc_count.interface.js.map
