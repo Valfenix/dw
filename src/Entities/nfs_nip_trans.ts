@@ -6,8 +6,8 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
-@Entity('nfs_nip')
-export class nfs_nip {
+@Entity('nfs_nip_trans')
+export class nfs_nip_trans {
   @PrimaryGeneratedColumn()
   public id!: number;
 
@@ -38,4 +38,4 @@ export class nfs_nip {
   public updatedAt!: Date;
 }
 
-export default nfs_nip;
+export default nfs_nip_trans;

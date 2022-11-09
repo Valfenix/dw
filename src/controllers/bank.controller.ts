@@ -30,8 +30,8 @@ class BankController {
       });
     }
 
-    const bankPosRepository = getRepository(nfs_pos_bank_list, 'MYSQL');
-    const bankNipRepository = getRepository(nfs_nip_bank_list, 'MYSQL');
+    const bankPosRepository = getRepository(nfs_pos_bank_list, 'UTILITYAPPDB');
+    const bankNipRepository = getRepository(nfs_nip_bank_list, 'NIPDB');
 
     let checkPosBank = await bankPosRepository.findOne({
       where: { bank_code },
@@ -84,8 +84,8 @@ class BankController {
       });
     }
 
-    const bankNipRepository = getRepository(nfs_nip_bank_list, 'MYSQL');
-    const bankPosRepository = getRepository(nfs_pos_bank_list, 'MYSQL');
+    const bankNipRepository = getRepository(nfs_nip_bank_list, 'NIPDB');
+    const bankPosRepository = getRepository(nfs_pos_bank_list, 'UTILITYAPPDB');
 
     let checkNipBank = await bankNipRepository.findOne({
       where: { bank_code },
@@ -121,7 +121,7 @@ class BankController {
 
   public static bankListPipelinePos = async () => {
     try {
-      const bankRepository = getRepository(nfs_pos_bank_list, 'MYSQL');
+      const bankRepository = getRepository(nfs_pos_bank_list, 'UTILITYAPPDB');
 
       // Check count of documents in NIBSS MYSQL Database
       let checkBank = await bankRepository.find();
@@ -178,7 +178,7 @@ class BankController {
 
   public static bankListPipelineNip = async () => {
     try {
-      const bankRepository = getRepository(nfs_nip_bank_list, 'MYSQL');
+      const bankRepository = getRepository(nfs_nip_bank_list, 'NIPDB');
 
       // Check count of documents in NIBSS MYSQL Database
       let checkBank = await bankRepository.find();

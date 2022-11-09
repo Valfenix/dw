@@ -45,6 +45,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var mongoose_1 = __importDefault(require("mongoose"));
 var events_1 = require("events");
 var config_1 = require("../config/config");
+var data_store_controller_1 = __importDefault(require("../controllers/data_store.controller"));
 var logger_1 = __importDefault(require("../lib/logger"));
 var constants_1 = require("../config/constants");
 var DatabaseMongoService = /** @class */ (function () {
@@ -55,10 +56,11 @@ var DatabaseMongoService = /** @class */ (function () {
             var _this = this;
             return __generator(this, function (_a) {
                 mongoose_1.default
-                    .connect(config_1.MONGO_DB_URL_TEST, config_1.MONGO_OPTIONS)
+                    .connect(config_1.MONGO_DB_URL, config_1.MONGO_OPTIONS)
                     .then(function () { return __awaiter(_this, void 0, void 0, function () {
                     return __generator(this, function (_a) {
-                        DatabaseMongoService.logger.info("Connected to MongoDB");
+                        DatabaseMongoService.logger.info("Connected to NFSMAPS MongoDB");
+                        data_store_controller_1.default.statesLga();
                         return [2 /*return*/];
                     });
                 }); })

@@ -45,11 +45,12 @@ var events_1 = require("events");
 var nfs_pos_bank_list_1 = __importDefault(require("../Entities/nfs_pos_bank_list"));
 var nfs_nip_bank_list_1 = __importDefault(require("../Entities/nfs_nip_bank_list"));
 var nfs_pos_1 = __importDefault(require("../Entities/nfs_pos"));
-var nfs_nip_1 = __importDefault(require("../Entities/nfs_nip"));
+var nfs_nip_trans_1 = __importDefault(require("../Entities/nfs_nip_trans"));
 var document_store_1 = __importDefault(require("../Entities/document_store"));
 var collection_type_1 = __importDefault(require("../Entities/collection_type"));
 var logger_1 = __importDefault(require("../lib/logger"));
 var constants_1 = require("../config/constants");
+// import config from '../config/config';
 var DatabaseService = /** @class */ (function () {
     function DatabaseService() {
     }
@@ -96,16 +97,28 @@ var DatabaseService = /** @class */ (function () {
                 switch (_a.label) {
                     case 0: return [4 /*yield*/, (0, typeorm_1.createConnections)([
                             {
-                                name: 'MYSQL',
+                                name: 'UTILITYAPPDB',
                                 type: 'mysql',
-                                host: String(process.env.DB_HOST) || 'localhost',
-                                username: String(process.env.DB_USERNAME),
-                                password: String(process.env.DB_PASSWORD),
-                                port: Number(process.env.DB_PORT),
-                                database: String(process.env.DB_DATABASE),
+                                host: String(process.env.MYSQL_DB_HOST1),
+                                username: String(process.env.MYSQL_DB_USERNAME1),
+                                password: String(process.env.MYSQL_DB_PASSWORD1),
+                                port: Number(process.env.MYSQL_DB_PORT1),
+                                database: String(process.env.MYSQL_DB_DATABASE1),
                                 synchronize: true,
-                                logging: true,
-                                entities: [nfs_pos_bank_list_1.default, nfs_nip_bank_list_1.default, collection_type_1.default, nfs_pos_1.default, nfs_nip_1.default],
+                                logging: false,
+                                entities: [nfs_pos_bank_list_1.default, nfs_pos_1.default, collection_type_1.default],
+                            },
+                            {
+                                name: 'NIPDB',
+                                type: 'mysql',
+                                host: String(process.env.MYSQL_DB_HOST2),
+                                username: String(process.env.MYSQL_DB_USERNAME2),
+                                password: String(process.env.MYSQL_DB_PASSWORD2),
+                                port: Number(process.env.MYSQL_DB_PORT2),
+                                database: String(process.env.MYSQL_DB_DATABASE2),
+                                synchronize: true,
+                                logging: false,
+                                entities: [nfs_nip_bank_list_1.default, collection_type_1.default, nfs_nip_trans_1.default],
                             },
                             {
                                 name: 'POSTGRES',
@@ -115,37 +128,13 @@ var DatabaseService = /** @class */ (function () {
                                 password: String(process.env.POSTGRES_DB_PASSWORD),
                                 port: Number(process.env.POSTGRES_DB_PORT),
                                 database: String(process.env.POSTGRES_DB_DATABASE),
-                                synchronize: true,
-                                logging: true,
+                                synchronize: false,
+                                logging: false,
                                 entities: [document_store_1.default],
                             },
-                            // {
-                            //   name: 'MYSQL',
-                            //   type: 'mysql',
-                            //   host: String('localhost'),
-                            //   username: String('root'),
-                            //   password: String('Rasengan_123'),
-                            //   port: Number(3306),
-                            //   database: String('utilityappdb'),
-                            //   synchronize: true,
-                            //   logging: true,
-                            //   entities: [nfs_pos_bank_list, nfs_nip_bank_list, collection_type, nfs_pos, nfs_nip],
-                            // },
-                            // {
-                            //   name: 'POSTGRES',
-                            //   type: 'postgres',
-                            //   host: String('localhost'),
-                            //   username: String('postgres'),
-                            //   password: String('Rasengan_123'),
-                            //   port: Number(5432),
-                            //   database: String('cbn'),
-                            //   synchronize: true,
-                            //   logging: true,
-                            //   entities: [DocumentStore],
-                            // },
                         ])
                             .then(function () {
-                            DatabaseService.logger.info('Connected to MYSQL & POSTGRES');
+                            DatabaseService.logger.info('Connected to MYSQL UTILITY_APP_DB AND MYSQL NIP_DB & POSTGRES CBN');
                         })
                             .catch(function (_err) {
                             console.log(_err);

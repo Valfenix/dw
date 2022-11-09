@@ -47,7 +47,7 @@ var collection_type_1 = __importDefault(require("../../Entities/collection_type"
 var nfs_pos_1 = __importDefault(require("../../Entities/nfs_pos"));
 var MysqlDBConnection_1 = require("../../services/MysqlDBConnection");
 var transaction_controller_1 = __importDefault(require("../../controllers/transaction.controller"));
-var nfs_nip_1 = __importDefault(require("../../Entities/nfs_nip"));
+var nfs_nip_trans_1 = __importDefault(require("../../Entities/nfs_nip_trans"));
 var collectionTypeRepository;
 var transactionPosRepository;
 var transactionNipRepository;
@@ -59,7 +59,7 @@ beforeAll(function () { return __awaiter(void 0, void 0, void 0, function () {
                 _a.sent();
                 collectionTypeRepository = (0, typeorm_1.getRepository)(collection_type_1.default, 'MYSQL');
                 transactionPosRepository = (0, typeorm_1.getRepository)(nfs_pos_1.default, 'MYSQL');
-                transactionNipRepository = (0, typeorm_1.getRepository)(nfs_nip_1.default, 'MYSQL');
+                transactionNipRepository = (0, typeorm_1.getRepository)(nfs_nip_trans_1.default, 'MYSQL');
                 return [4 /*yield*/, doc_count_model_1.default.remove()];
             case 2:
                 _a.sent();

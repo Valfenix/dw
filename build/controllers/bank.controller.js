@@ -82,8 +82,8 @@ var BankController = /** @class */ (function () {
                                 message: error.details[0].message,
                             })];
                     }
-                    bankPosRepository = (0, typeorm_1.getRepository)(nfs_pos_bank_list_1.default, 'MYSQL');
-                    bankNipRepository = (0, typeorm_1.getRepository)(nfs_nip_bank_list_1.default, 'MYSQL');
+                    bankPosRepository = (0, typeorm_1.getRepository)(nfs_pos_bank_list_1.default, 'UTILITYAPPDB');
+                    bankNipRepository = (0, typeorm_1.getRepository)(nfs_nip_bank_list_1.default, 'NIPDB');
                     return [4 /*yield*/, bankPosRepository.findOne({
                             where: { bank_code: bank_code },
                         })];
@@ -137,8 +137,8 @@ var BankController = /** @class */ (function () {
                                 message: error.details[0].message,
                             })];
                     }
-                    bankNipRepository = (0, typeorm_1.getRepository)(nfs_nip_bank_list_1.default, 'MYSQL');
-                    bankPosRepository = (0, typeorm_1.getRepository)(nfs_pos_bank_list_1.default, 'MYSQL');
+                    bankNipRepository = (0, typeorm_1.getRepository)(nfs_nip_bank_list_1.default, 'NIPDB');
+                    bankPosRepository = (0, typeorm_1.getRepository)(nfs_pos_bank_list_1.default, 'UTILITYAPPDB');
                     return [4 /*yield*/, bankNipRepository.findOne({
                             where: { bank_code: bank_code },
                         })];
@@ -179,7 +179,7 @@ var BankController = /** @class */ (function () {
             switch (_b.label) {
                 case 0:
                     _b.trys.push([0, 6, , 7]);
-                    bankRepository = (0, typeorm_1.getRepository)(nfs_pos_bank_list_1.default, 'MYSQL');
+                    bankRepository = (0, typeorm_1.getRepository)(nfs_pos_bank_list_1.default, 'UTILITYAPPDB');
                     return [4 /*yield*/, bankRepository.find()];
                 case 1:
                     checkBank_1 = _b.sent();
@@ -256,7 +256,7 @@ var BankController = /** @class */ (function () {
             switch (_b.label) {
                 case 0:
                     _b.trys.push([0, 6, , 7]);
-                    bankRepository = (0, typeorm_1.getRepository)(nfs_nip_bank_list_1.default, 'MYSQL');
+                    bankRepository = (0, typeorm_1.getRepository)(nfs_nip_bank_list_1.default, 'NIPDB');
                     return [4 /*yield*/, bankRepository.find()];
                 case 1:
                     checkBank_2 = _b.sent();

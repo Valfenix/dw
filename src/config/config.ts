@@ -26,7 +26,7 @@ export const env = {
 
 // MONGODB CONNECTION CONFIGURATIONS
 export const MONGO_DB_URL = getEnv('MONGO_DB_URL')!;
-export const MONGO_DB_URL_TEST = getEnv('MONGO_DB_URL_TEST')!;
+// export const MONGO_DB_URL_TEST = getEnv('MONGO_DB_URL_TEST')!;
 export const MONGO_OPTIONS = {
   useUnifiedTopology: true,
   useNewUrlParser: true,

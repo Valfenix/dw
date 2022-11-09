@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.MONGO_OPTIONS = exports.MONGO_DB_URL_TEST = exports.MONGO_DB_URL = exports.env = void 0;
+exports.MONGO_OPTIONS = exports.MONGO_DB_URL = exports.env = void 0;
 var dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config();
 function getEnv(variable, optional) {
@@ -29,7 +29,7 @@ exports.env = {
 };
 // MONGODB CONNECTION CONFIGURATIONS
 exports.MONGO_DB_URL = getEnv('MONGO_DB_URL');
-exports.MONGO_DB_URL_TEST = getEnv('MONGO_DB_URL_TEST');
+// export const MONGO_DB_URL_TEST = getEnv('MONGO_DB_URL_TEST')!;
 exports.MONGO_OPTIONS = {
     useUnifiedTopology: true,
     useNewUrlParser: true,

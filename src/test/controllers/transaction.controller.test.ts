@@ -8,7 +8,7 @@ import collection_type from '../../Entities/collection_type';
 import nfs_pos from '../../Entities/nfs_pos';
 import { DatabaseService } from '../../services/MysqlDBConnection';
 import TransactionController from '../../controllers/transaction.controller';
-import nfs_nip from '../../Entities/nfs_nip';
+import nfs_nip from '../../Entities/nfs_nip_trans';
 
 let collectionTypeRepository: any;
 let transactionPosRepository: any;

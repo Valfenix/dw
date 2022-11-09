@@ -61,7 +61,7 @@ var collection_type_model_1 = __importDefault(require("../models/collection_type
 var node_cron_1 = __importDefault(require("node-cron"));
 var collection_type_1 = __importDefault(require("../Entities/collection_type"));
 var nfs_pos_1 = __importDefault(require("../Entities/nfs_pos"));
-var nfs_nip_1 = __importDefault(require("../Entities/nfs_nip"));
+var nfs_nip_trans_1 = __importDefault(require("../Entities/nfs_nip_trans"));
 var TransactionController = /** @class */ (function () {
     function TransactionController() {
     }
@@ -86,7 +86,7 @@ var TransactionController = /** @class */ (function () {
                                 message: error.details[0].message,
                             })];
                     }
-                    collectionTypeRepository = (0, typeorm_1.getRepository)(collection_type_1.default, 'MYSQL');
+                    collectionTypeRepository = (0, typeorm_1.getRepository)(collection_type_1.default, 'UTILITYAPPDB');
                     return [4 /*yield*/, collectionTypeRepository.findOne({
                             where: { code: code },
                         })];
@@ -139,7 +139,7 @@ var TransactionController = /** @class */ (function () {
                                 message: error.details[0].message,
                             })];
                     }
-                    transactionPosRepository = (0, typeorm_1.getRepository)(nfs_pos_1.default, 'MYSQL');
+                    transactionPosRepository = (0, typeorm_1.getRepository)(nfs_pos_1.default, 'UTILITYAPPDB');
                     transaction = new nfs_pos_1.default();
                     transaction.CollectionType = CollectionType;
                     transaction.TransactionDate = new Date(TransactionDate);
@@ -181,8 +181,8 @@ var TransactionController = /** @class */ (function () {
                                 message: error.details[0].message,
                             })];
                     }
-                    transactionNipRepository = (0, typeorm_1.getRepository)(nfs_nip_1.default, 'MYSQL');
-                    transaction = new nfs_nip_1.default();
+                    transactionNipRepository = (0, typeorm_1.getRepository)(nfs_nip_trans_1.default, 'NIPDB');
+                    transaction = new nfs_nip_trans_1.default();
                     transaction.CollectionType = CollectionType;
                     transaction.TransactionDate = TransactionDate;
                     transaction.SourceBank = SourceBank;
@@ -208,7 +208,7 @@ var TransactionController = /** @class */ (function () {
             switch (_b.label) {
                 case 0:
                     _b.trys.push([0, 6, , 7]);
-                    collectionTypeRepository = (0, typeorm_1.getRepository)(collection_type_1.default, 'MYSQL');
+                    collectionTypeRepository = (0, typeorm_1.getRepository)(collection_type_1.default, 'UTILITYAPPDB');
                     return [4 /*yield*/, collectionTypeRepository.find()];
                 case 1:
                     checkCollectionType_1 = _b.sent();
@@ -288,7 +288,7 @@ var TransactionController = /** @class */ (function () {
             switch (_p.label) {
                 case 0:
                     _p.trys.push([0, 26, , 27]);
-                    transactionPosRepository = (0, typeorm_1.getRepository)(nfs_pos_1.default, 'MYSQL');
+                    transactionPosRepository = (0, typeorm_1.getRepository)(nfs_pos_1.default, 'UTILITYAPPDB');
                     return [4 /*yield*/, transactionPosRepository.find()];
                 case 1:
                     checkTransaction = _p.sent();
@@ -494,7 +494,7 @@ var TransactionController = /** @class */ (function () {
             switch (_p.label) {
                 case 0:
                     _p.trys.push([0, 26, , 27]);
-                    transactionNipRepository = (0, typeorm_1.getRepository)(nfs_nip_1.default, 'MYSQL');
+                    transactionNipRepository = (0, typeorm_1.getRepository)(nfs_nip_trans_1.default, 'NIPDB');
                     return [4 /*yield*/, transactionNipRepository.find()];
                 case 1:
                     checkTransaction = _p.sent();

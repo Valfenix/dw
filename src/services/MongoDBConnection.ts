@@ -4,7 +4,7 @@
 
 import mongoose from 'mongoose';
 import { EventEmitter } from 'events';
-import { MONGO_DB_URL, MONGO_DB_URL_TEST, MONGO_OPTIONS } from '../config/config';
+import { MONGO_DB_URL, MONGO_OPTIONS } from '../config/config';
 import DocumentStoreController from '../controllers/data_store.controller';
 import Logger from '../lib/logger';
 import { DATABASE_NAMESPACE } from '../config/constants';
@@ -15,10 +15,10 @@ class DatabaseMongoService {
 
   static async MongooseService() {
     mongoose
-      .connect(MONGO_DB_URL_TEST, MONGO_OPTIONS)
+      .connect(MONGO_DB_URL, MONGO_OPTIONS)
       .then(async () => {
-        DatabaseMongoService.logger.info(`Connected to MongoDB`);
-        // DocumentStoreController.statesLga();
+        DatabaseMongoService.logger.info(`Connected to NFSMAPS MongoDB`);
+        DocumentStoreController.statesLga();
       })
       .catch((_err: Error) => {
         // now do retry //

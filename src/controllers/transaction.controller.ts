@@ -11,7 +11,7 @@ import CollectionType from '../models/collection_type.model';
 import cron from 'node-cron';
 import collection_type from '../Entities/collection_type';
 import nfs_pos from '../Entities/nfs_pos';
-import nfs_nip from '../Entities/nfs_nip';
+import nfs_nip_trans from '../Entities/nfs_nip_trans';
 import { IDailySummary } from '../interfaces/daily_summary.interface';
 import { IMonthlySummary } from '../interfaces/monthly_summary.interface';
 import { IYearlySummary } from '../interfaces/yearly_summary.interface';
@@ -36,7 +36,7 @@ class TransactionController {
       });
     }
 
-    const collectionTypeRepository = getRepository(collection_type, 'MYSQL');
+    const collectionTypeRepository = getRepository(collection_type, 'UTILITYAPPDB');
     let checkCollectionType = await collectionTypeRepository.findOne({
       where: { code: code },
     });
@@ -89,7 +89,7 @@ class TransactionController {
       });
     }
 
-    const transactionPosRepository = getRepository(nfs_pos, 'MYSQL');
+    const transactionPosRepository = getRepository(nfs_pos, 'UTILITYAPPDB');
 
     const transaction = new nfs_pos();
 
@@ -132,9 +132,9 @@ class TransactionController {
       });
     }
 
-    const transactionNipRepository = getRepository(nfs_nip, 'MYSQL');
+    const transactionNipRepository = getRepository(nfs_nip_trans, 'NIPDB');
 
-    const transaction = new nfs_nip();
+    const transaction = new nfs_nip_trans();
 
     transaction.CollectionType = CollectionType;
     transaction.TransactionDate = TransactionDate;
@@ -155,7 +155,7 @@ class TransactionController {
 
   public static collectionTypePipeline = async () => {
     try {
-      const collectionTypeRepository = getRepository(collection_type, 'MYSQL');
+      const collectionTypeRepository = getRepository(collection_type, 'UTILITYAPPDB');
 
       // Check count of documents in NIBSS MYSQL Database
       let checkCollectionType = await collectionTypeRepository.find();
@@ -216,7 +216,7 @@ class TransactionController {
 
   public static posTransactionPipeline = async () => {
     try {
-      const transactionPosRepository = getRepository(nfs_pos, 'MYSQL');
+      const transactionPosRepository = getRepository(nfs_pos, 'UTILITYAPPDB');
 
       // Check count of documents in CBN MYSQL Database
       let checkTransaction = await transactionPosRepository.find();
@@ -408,7 +408,7 @@ class TransactionController {
 
   public static nipTransactionPipeline = async () => {
     try {
-      const transactionNipRepository = getRepository(nfs_nip, 'MYSQL');
+      const transactionNipRepository = getRepository(nfs_nip_trans, 'NIPDB');
 
       // Check count of documents in CBN MYSQL Database
       let checkTransaction = await transactionNipRepository.find();
