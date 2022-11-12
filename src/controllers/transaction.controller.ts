@@ -9,7 +9,7 @@ import { IDocCount, ICountCategory } from '../interfaces/doc_count.interface';
 import { ICollectionType } from '../interfaces/collection_type.interface';
 import CollectionType from '../models/collection_type.model';
 import cron from 'node-cron';
-import collection_type from '../Entities/collection_type';
+// import collection_type from '../Entities/collection_type';
 import nfs_pos from '../Entities/nfs_pos';
 import nfs_nip_trans from '../Entities/nfs_nip_trans';
 import { IDailySummary } from '../interfaces/daily_summary.interface';
@@ -17,53 +17,53 @@ import { IMonthlySummary } from '../interfaces/monthly_summary.interface';
 import { IYearlySummary } from '../interfaces/yearly_summary.interface';
 
 class TransactionController {
-  public static createCollectionType = async (req: Request, res: Response) => {
-    const { code, description, category, success } = req.body;
+  // public static createCollectionType = async (req: Request, res: Response) => {
+  //   const { code, description, category, success } = req.body;
 
-    const collectionTypeSchema = Joi.object({
-      code: Joi.number().required(),
-      description: Joi.string().required(),
-      category: Joi.string().required(),
-    }).unknown();
+  //   const collectionTypeSchema = Joi.object({
+  //     code: Joi.number().required(),
+  //     description: Joi.string().required(),
+  //     category: Joi.string().required(),
+  //   }).unknown();
 
-    const { error } = collectionTypeSchema.validate({ ...req.body });
+  //   const { error } = collectionTypeSchema.validate({ ...req.body });
 
-    if (error) {
-      return res.status(400).json({
-        success: false,
-        statusCode: 400,
-        message: error.details[0].message,
-      });
-    }
+  //   if (error) {
+  //     return res.status(400).json({
+  //       success: false,
+  //       statusCode: 400,
+  //       message: error.details[0].message,
+  //     });
+  //   }
 
-    const collectionTypeRepository = getRepository(collection_type, 'UTILITYAPPDB');
-    let checkCollectionType = await collectionTypeRepository.findOne({
-      where: { code: code },
-    });
+  //   const collectionTypeRepository = getRepository(collection_type, 'UTILITYAPPDB');
+  //   let checkCollectionType = await collectionTypeRepository.findOne({
+  //     where: { code: code },
+  //   });
 
-    if (checkCollectionType) {
-      return res.status(409).json({
-        success: false,
-        statusCode: 409,
-        message: 'Collection type exists already',
-      });
-    }
+  //   if (checkCollectionType) {
+  //     return res.status(409).json({
+  //       success: false,
+  //       statusCode: 409,
+  //       message: 'Collection type exists already',
+  //     });
+  //   }
 
-    const collection = new collection_type();
-    collection.code = code;
-    collection.description = description;
-    collection.category = category;
-    collection.success = success;
+  //   const collection = new collection_type();
+  //   collection.code = code;
+  //   collection.description = description;
+  //   collection.category = category;
+  //   collection.success = success;
 
-    let result = await collectionTypeRepository.save(collection);
+  //   let result = await collectionTypeRepository.save(collection);
 
-    res.status(201).json({
-      success: true,
-      statusCode: 201,
-      message: `Collection type created successfully`,
-      data: result,
-    });
-  };
+  //   res.status(201).json({
+  //     success: true,
+  //     statusCode: 201,
+  //     message: `Collection type created successfully`,
+  //     data: result,
+  //   });
+  // };
 
   public static createPosTransaction = async (req: Request, res: Response) => {
     const { CollectionType, TransactionDate, SourceBank, DestinationBank, Volumn, value_ } =
@@ -153,66 +153,66 @@ class TransactionController {
     });
   };
 
-  public static collectionTypePipeline = async () => {
-    try {
-      const collectionTypeRepository = getRepository(collection_type, 'UTILITYAPPDB');
+  // public static collectionTypePipeline = async () => {
+  //   try {
+  //     const collectionTypeRepository = getRepository(collection_type, 'UTILITYAPPDB');
 
-      // Check count of documents in NIBSS MYSQL Database
-      let checkCollectionType = await collectionTypeRepository.find();
+  //     // Check count of documents in NIBSS MYSQL Database
+  //     let checkCollectionType = await collectionTypeRepository.find();
 
-      // Get previous count data from MONGO Database
-      let getCount: any = await DocCount.findOne({ category: ICountCategory.COLLECTION_TYPE });
+  //     // Get previous count data from MONGO Database
+  //     let getCount: any = await DocCount.findOne({ category: ICountCategory.COLLECTION_TYPE });
 
-      // If count is not null
+  //     // If count is not null
 
-      if (getCount !== null) {
-        // If NIBSS data is more than the previous count, update
+  //     if (getCount !== null) {
+  //       // If NIBSS data is more than the previous count, update
 
-        if (checkCollectionType.length > getCount.count) {
-          checkCollectionType.forEach(async (e: any) => {
-            let result = await CollectionType.updateMany(
-              { old_id: e.code },
-              {
-                $setOnInsert: {
-                  old_id: e.code,
-                  category: e.category,
-                  success: e.success,
-                  description: e.description,
-                },
-              },
-              { upsert: true }
-            );
+  //       if (checkCollectionType.length > getCount.count) {
+  //         checkCollectionType.forEach(async (e: any) => {
+  //           let result = await CollectionType.updateMany(
+  //             { old_id: e.code },
+  //             {
+  //               $setOnInsert: {
+  //                 old_id: e.code,
+  //                 category: e.category,
+  //                 success: e.success,
+  //                 description: e.description,
+  //               },
+  //             },
+  //             { upsert: true }
+  //           );
 
-            if (result.upsertedCount > 0) {
-              await DocCount.findByIdAndUpdate(
-                { _id: getCount._id },
-                { count: checkCollectionType.length }
-              );
-            }
-          });
-          console.log('COLLECTION UPDATED');
-        }
-      } else {
-        checkCollectionType.forEach(async (e: any) => {
-          const collectionTypePayload: ICollectionType = {
-            old_id: e.code,
-            category: e.category,
-            success: e.success,
-            description: e.description,
-          };
-          await CollectionType.create(collectionTypePayload);
-        });
-        console.log('COLLECTION CREATED');
-        const countPayload: IDocCount = {
-          count: checkCollectionType.length,
-          category: ICountCategory.COLLECTION_TYPE,
-        };
-        await DocCount.create(countPayload);
-      }
-    } catch (err: any) {
-      console.log(err.message);
-    }
-  };
+  //           if (result.upsertedCount > 0) {
+  //             await DocCount.findByIdAndUpdate(
+  //               { _id: getCount._id },
+  //               { count: checkCollectionType.length }
+  //             );
+  //           }
+  //         });
+  //         console.log('COLLECTION UPDATED');
+  //       }
+  //     } else {
+  //       checkCollectionType.forEach(async (e: any) => {
+  //         const collectionTypePayload: ICollectionType = {
+  //           old_id: e.code,
+  //           category: e.category,
+  //           success: e.success,
+  //           description: e.description,
+  //         };
+  //         await CollectionType.create(collectionTypePayload);
+  //       });
+  //       console.log('COLLECTION CREATED');
+  //       const countPayload: IDocCount = {
+  //         count: checkCollectionType.length,
+  //         category: ICountCategory.COLLECTION_TYPE,
+  //       };
+  //       await DocCount.create(countPayload);
+  //     }
+  //   } catch (err: any) {
+  //     console.log(err.message);
+  //   }
+  // };
 
   public static posTransactionPipeline = async () => {
     try {
@@ -247,7 +247,7 @@ class TransactionController {
           });
           for (let i = 0; i < checkStoreLoop.length; i++) {
             let getCollectionType = await CollectionType.findOne({
-              code: checkStoreLoop[i].CollectionType,
+              old_id: checkStoreLoop[i].CollectionType,
             });
             let collection_id = getCollectionType ? getCollectionType._id : null;
 
@@ -439,7 +439,7 @@ class TransactionController {
           });
           for (let i = 0; i < checkStoreLoop.length; i++) {
             let getCollectionType = await CollectionType.findOne({
-              code: checkStoreLoop[i].CollectionType,
+              old_id: checkStoreLoop[i].CollectionType,
             });
             let collection_id = getCollectionType ? getCollectionType._id : null;
 
@@ -605,5 +605,5 @@ export default TransactionController;
 cron.schedule(String(process.env.CRON), async () => {
   TransactionController.posTransactionPipeline();
   TransactionController.nipTransactionPipeline();
-  TransactionController.collectionTypePipeline();
+  // TransactionController.collectionTypePipeline();
 });

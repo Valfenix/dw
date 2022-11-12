@@ -5,7 +5,7 @@ import nfs_nip_bank_list from '../Entities/nfs_nip_bank_list';
 import nfs_pos from '../Entities/nfs_pos';
 import nfs_nip_trans from '../Entities/nfs_nip_trans';
 import DocumentStore from '../Entities/document_store';
-import collection_type from '../Entities/collection_type';
+// import collection_type from '../Entities/collection_type';
 import Logger from '../lib/logger';
 import { DATABASE_NAMESPACE } from '../config/constants';
 // import config from '../config/config';
@@ -40,7 +40,11 @@ class DatabaseService {
         database: String(process.env.MYSQL_DB_DATABASE1),
         synchronize: true,
         logging: false,
-        entities: [nfs_pos_bank_list, nfs_pos, collection_type],
+        entities: [
+          nfs_pos_bank_list,
+          nfs_pos,
+          //  collection_type
+        ],
       },
       {
         name: 'NIPDB',
@@ -52,7 +56,11 @@ class DatabaseService {
         database: String(process.env.MYSQL_DB_DATABASE2),
         synchronize: true,
         logging: false,
-        entities: [nfs_nip_bank_list, collection_type, nfs_nip_trans],
+        entities: [
+          nfs_nip_bank_list,
+          //  collection_type,
+          nfs_nip_trans,
+        ],
       },
       {
         name: 'POSTGRES',
