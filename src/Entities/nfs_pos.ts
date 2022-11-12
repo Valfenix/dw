@@ -8,8 +8,8 @@ import {
 
 @Entity('nfs_pos')
 export class nfs_pos {
-  // @PrimaryGeneratedColumn()
-  // public id!: number;
+  @PrimaryGeneratedColumn()
+  public id!: number;
 
   @Column({ default: null })
   public TransactionDate!: Date;
