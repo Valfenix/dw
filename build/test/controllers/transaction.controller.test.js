@@ -43,7 +43,6 @@ var index_1 = __importDefault(require("../../index"));
 var supertest_1 = __importDefault(require("supertest"));
 var typeorm_1 = require("typeorm");
 var doc_count_model_1 = __importDefault(require("../../models/doc_count.model"));
-var collection_type_1 = __importDefault(require("../../Entities/collection_type"));
 var nfs_pos_1 = __importDefault(require("../../Entities/nfs_pos"));
 var MysqlDBConnection_1 = require("../../services/MysqlDBConnection");
 var transaction_controller_1 = __importDefault(require("../../controllers/transaction.controller"));
@@ -57,7 +56,6 @@ beforeAll(function () { return __awaiter(void 0, void 0, void 0, function () {
             case 0: return [4 /*yield*/, MysqlDBConnection_1.DatabaseService.getConnection()];
             case 1:
                 _a.sent();
-                collectionTypeRepository = (0, typeorm_1.getRepository)(collection_type_1.default, 'MYSQL');
                 transactionPosRepository = (0, typeorm_1.getRepository)(nfs_pos_1.default, 'MYSQL');
                 transactionNipRepository = (0, typeorm_1.getRepository)(nfs_nip_trans_1.default, 'MYSQL');
                 return [4 /*yield*/, doc_count_model_1.default.remove()];
@@ -100,45 +98,6 @@ afterAll(function () { return __awaiter(void 0, void 0, void 0, function () {
     });
 }); });
 describe('POST /Transactions', function () {
-    it('returns status code 400 when a field is missing', function () { return __awaiter(void 0, void 0, void 0, function () {
-        var res;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0: return [4 /*yield*/, (0, supertest_1.default)(index_1.default).post('/api/v2/transaction/create-collection').send({})];
-                case 1:
-                    res = _a.sent();
-                    expect(res.statusCode).toEqual(400);
-                    return [2 /*return*/];
-            }
-        });
-    }); });
-    it('returns status code 409 when collection type exists already', function () { return __awaiter(void 0, void 0, void 0, function () {
-        var cat, res;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    jest.setTimeout(10000);
-                    cat = new collection_type_1.default();
-                    cat.description = 'mCASH Unsuccessful';
-                    cat.category = 'mCASH';
-                    cat.success = false;
-                    cat.code = 10001;
-                    return [4 /*yield*/, collectionTypeRepository.save(cat)];
-                case 1:
-                    _a.sent();
-                    return [4 /*yield*/, (0, supertest_1.default)(index_1.default).post('/api/v2/transaction/create-collection').send({
-                            description: 'mCASH Unsuccessful',
-                            category: 'mCASH',
-                            success: false,
-                            code: 10001,
-                        })];
-                case 2:
-                    res = _a.sent();
-                    expect(res.statusCode).toEqual(409);
-                    return [2 /*return*/];
-            }
-        });
-    }); });
     it('returns status code 201 when collection type is inserted', function () { return __awaiter(void 0, void 0, void 0, function () {
         var res;
         return __generator(this, function (_a) {
@@ -154,35 +113,6 @@ describe('POST /Transactions', function () {
                 case 1:
                     res = _a.sent();
                     expect(res.statusCode).toEqual(201);
-                    return [2 /*return*/];
-            }
-        });
-    }); });
-    it('it should pass the collectionType cron job, return and create a collection type payload', function () { return __awaiter(void 0, void 0, void 0, function () {
-        var cat, check, logSpy;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    jest.setTimeout(10000);
-                    cat = new collection_type_1.default();
-                    cat.description = 'POS Unsuccessful';
-                    cat.category = 'POS';
-                    cat.success = false;
-                    return [4 /*yield*/, collectionTypeRepository.save(cat)];
-                case 1:
-                    _a.sent();
-                    check = { schedule: jest.fn() };
-                    logSpy = jest.spyOn(console, 'log');
-                    check.schedule.mockImplementationOnce(function (frequency, callback) { return __awaiter(void 0, void 0, void 0, function () { return __generator(this, function (_a) {
-                        switch (_a.label) {
-                            case 0: return [4 /*yield*/, callback()];
-                            case 1: return [2 /*return*/, _a.sent()];
-                        }
-                    }); }); });
-                    return [4 /*yield*/, transaction_controller_1.default.collectionTypePipeline()];
-                case 2:
-                    _a.sent();
-                    expect(logSpy).toBeCalledWith('COLLECTION CREATED');
                     return [2 /*return*/];
             }
         });

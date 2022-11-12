@@ -1,7 +1,4 @@
 "use strict";
-/**
- *  DO NOT DELETE THIS FILE OR THE DATABASE SERVICE IS LOST == Author = Valentine Offiah
- */
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -42,42 +39,62 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var mongoose_1 = __importDefault(require("mongoose"));
-var events_1 = require("events");
-var config_1 = require("../config/config");
-var data_store_controller_1 = __importDefault(require("../controllers/data_store.controller"));
-var seed_collection_types_1 = __importDefault(require("../controllers/seed_collection_types"));
-var logger_1 = __importDefault(require("../lib/logger"));
-var constants_1 = require("../config/constants");
-var DatabaseMongoService = /** @class */ (function () {
-    function DatabaseMongoService() {
-    }
-    DatabaseMongoService.MongooseService = function () {
-        return __awaiter(this, void 0, void 0, function () {
-            var _this = this;
+var collection_type_model_1 = __importDefault(require("../models/collection_type.model"));
+// Collection Type List to be seeded
+var CollectionList = [
+    {
+        old_id: 60,
+        description: 'NIP Successful',
+        category: 'NIP',
+        success: true,
+    },
+    {
+        old_id: 61,
+        description: 'NIP Unsuccessful',
+        category: 'NIP',
+        success: false,
+    },
+    {
+        old_id: 62,
+        description: 'POS Successful',
+        category: 'POS',
+        success: true,
+    },
+    {
+        old_id: 63,
+        description: 'POS Unsuccessful',
+        category: 'POS',
+        success: false,
+    },
+];
+var seedCollection = function () {
+    try {
+        CollectionList.forEach(function (collection) { return __awaiter(void 0, void 0, void 0, function () {
+            var checkCollectionType, savedCollectionType;
             return __generator(this, function (_a) {
-                mongoose_1.default
-                    .connect(config_1.MONGO_DB_URL, config_1.MONGO_OPTIONS)
-                    .then(function () { return __awaiter(_this, void 0, void 0, function () {
-                    return __generator(this, function (_a) {
-                        DatabaseMongoService.logger.info("Connected to NFSMAPS MongoDB");
-                        data_store_controller_1.default.statesLga();
-                        (0, seed_collection_types_1.default)();
-                        return [2 /*return*/];
-                    });
-                }); })
-                    .catch(function (_err) {
-                    // now do retry //
-                    DatabaseMongoService.logger.error('Database connection error... Retrying...');
-                    DatabaseMongoService.Emitter.emit('DB_CONN_ERROR');
-                });
-                return [2 /*return*/];
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, collection_type_model_1.default.findOne({
+                            old_id: collection.old_id,
+                        })];
+                    case 1:
+                        checkCollectionType = _a.sent();
+                        if (!checkCollectionType) return [3 /*break*/, 2];
+                        console.log("".concat(checkCollectionType.category, " ").concat(checkCollectionType.success, " already exists."));
+                        return [3 /*break*/, 4];
+                    case 2: return [4 /*yield*/, collection_type_model_1.default.create(collection)];
+                    case 3:
+                        savedCollectionType = _a.sent();
+                        console.log("".concat(savedCollectionType.category, " ").concat(savedCollectionType.success, " created."));
+                        _a.label = 4;
+                    case 4: return [2 /*return*/];
+                }
             });
-        });
-    };
-    DatabaseMongoService.Emitter = new events_1.EventEmitter();
-    DatabaseMongoService.logger = new logger_1.default('db', constants_1.DATABASE_NAMESPACE);
-    return DatabaseMongoService;
-}());
-exports.default = DatabaseMongoService;
-//# sourceMappingURL=MongoDBConnection.js.map
+        }); });
+        console.log('DONE');
+    }
+    catch (err) {
+        console.log(err.message);
+    }
+};
+exports.default = seedCollection;
+//# sourceMappingURL=seed_collection_types.js.map

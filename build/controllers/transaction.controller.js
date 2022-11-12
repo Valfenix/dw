@@ -59,7 +59,7 @@ var yearly_summary_1 = __importDefault(require("../models/yearly_summary"));
 var doc_count_interface_1 = require("../interfaces/doc_count.interface");
 var collection_type_model_1 = __importDefault(require("../models/collection_type.model"));
 var node_cron_1 = __importDefault(require("node-cron"));
-var collection_type_1 = __importDefault(require("../Entities/collection_type"));
+// import collection_type from '../Entities/collection_type';
 var nfs_pos_1 = __importDefault(require("../Entities/nfs_pos"));
 var nfs_nip_trans_1 = __importDefault(require("../Entities/nfs_nip_trans"));
 var TransactionController = /** @class */ (function () {
@@ -67,56 +67,45 @@ var TransactionController = /** @class */ (function () {
     }
     var _a;
     _a = TransactionController;
-    TransactionController.createCollectionType = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-        var _b, code, description, category, success, collectionTypeSchema, error, collectionTypeRepository, checkCollectionType, collection, result;
-        return __generator(_a, function (_c) {
-            switch (_c.label) {
-                case 0:
-                    _b = req.body, code = _b.code, description = _b.description, category = _b.category, success = _b.success;
-                    collectionTypeSchema = joi_1.default.object({
-                        code: joi_1.default.number().required(),
-                        description: joi_1.default.string().required(),
-                        category: joi_1.default.string().required(),
-                    }).unknown();
-                    error = collectionTypeSchema.validate(__assign({}, req.body)).error;
-                    if (error) {
-                        return [2 /*return*/, res.status(400).json({
-                                success: false,
-                                statusCode: 400,
-                                message: error.details[0].message,
-                            })];
-                    }
-                    collectionTypeRepository = (0, typeorm_1.getRepository)(collection_type_1.default, 'UTILITYAPPDB');
-                    return [4 /*yield*/, collectionTypeRepository.findOne({
-                            where: { code: code },
-                        })];
-                case 1:
-                    checkCollectionType = _c.sent();
-                    if (checkCollectionType) {
-                        return [2 /*return*/, res.status(409).json({
-                                success: false,
-                                statusCode: 409,
-                                message: 'Collection type exists already',
-                            })];
-                    }
-                    collection = new collection_type_1.default();
-                    collection.code = code;
-                    collection.description = description;
-                    collection.category = category;
-                    collection.success = success;
-                    return [4 /*yield*/, collectionTypeRepository.save(collection)];
-                case 2:
-                    result = _c.sent();
-                    res.status(201).json({
-                        success: true,
-                        statusCode: 201,
-                        message: "Collection type created successfully",
-                        data: result,
-                    });
-                    return [2 /*return*/];
-            }
-        });
-    }); };
+    // public static createCollectionType = async (req: Request, res: Response) => {
+    //   const { code, description, category, success } = req.body;
+    //   const collectionTypeSchema = Joi.object({
+    //     code: Joi.number().required(),
+    //     description: Joi.string().required(),
+    //     category: Joi.string().required(),
+    //   }).unknown();
+    //   const { error } = collectionTypeSchema.validate({ ...req.body });
+    //   if (error) {
+    //     return res.status(400).json({
+    //       success: false,
+    //       statusCode: 400,
+    //       message: error.details[0].message,
+    //     });
+    //   }
+    //   const collectionTypeRepository = getRepository(collection_type, 'UTILITYAPPDB');
+    //   let checkCollectionType = await collectionTypeRepository.findOne({
+    //     where: { code: code },
+    //   });
+    //   if (checkCollectionType) {
+    //     return res.status(409).json({
+    //       success: false,
+    //       statusCode: 409,
+    //       message: 'Collection type exists already',
+    //     });
+    //   }
+    //   const collection = new collection_type();
+    //   collection.code = code;
+    //   collection.description = description;
+    //   collection.category = category;
+    //   collection.success = success;
+    //   let result = await collectionTypeRepository.save(collection);
+    //   res.status(201).json({
+    //     success: true,
+    //     statusCode: 201,
+    //     message: `Collection type created successfully`,
+    //     data: result,
+    //   });
+    // };
     TransactionController.createPosTransaction = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
         var _b, CollectionType, TransactionDate, SourceBank, DestinationBank, Volumn, value_, collectionTypeSchema, error, transactionPosRepository, transaction, result;
         return __generator(_a, function (_c) {
@@ -202,87 +191,62 @@ var TransactionController = /** @class */ (function () {
             }
         });
     }); };
-    TransactionController.collectionTypePipeline = function () { return __awaiter(void 0, void 0, void 0, function () {
-        var collectionTypeRepository, checkCollectionType_1, getCount_1, countPayload, err_1;
-        return __generator(_a, function (_b) {
-            switch (_b.label) {
-                case 0:
-                    _b.trys.push([0, 6, , 7]);
-                    collectionTypeRepository = (0, typeorm_1.getRepository)(collection_type_1.default, 'UTILITYAPPDB');
-                    return [4 /*yield*/, collectionTypeRepository.find()];
-                case 1:
-                    checkCollectionType_1 = _b.sent();
-                    return [4 /*yield*/, doc_count_model_1.default.findOne({ category: doc_count_interface_1.ICountCategory.COLLECTION_TYPE })];
-                case 2:
-                    getCount_1 = _b.sent();
-                    if (!(getCount_1 !== null)) return [3 /*break*/, 3];
-                    // If NIBSS data is more than the previous count, update
-                    if (checkCollectionType_1.length > getCount_1.count) {
-                        checkCollectionType_1.forEach(function (e) { return __awaiter(void 0, void 0, void 0, function () {
-                            var result;
-                            return __generator(this, function (_b) {
-                                switch (_b.label) {
-                                    case 0: return [4 /*yield*/, collection_type_model_1.default.updateMany({ old_id: e.code }, {
-                                            $setOnInsert: {
-                                                old_id: e.code,
-                                                category: e.category,
-                                                success: e.success,
-                                                description: e.description,
-                                            },
-                                        }, { upsert: true })];
-                                    case 1:
-                                        result = _b.sent();
-                                        if (!(result.upsertedCount > 0)) return [3 /*break*/, 3];
-                                        return [4 /*yield*/, doc_count_model_1.default.findByIdAndUpdate({ _id: getCount_1._id }, { count: checkCollectionType_1.length })];
-                                    case 2:
-                                        _b.sent();
-                                        _b.label = 3;
-                                    case 3: return [2 /*return*/];
-                                }
-                            });
-                        }); });
-                        console.log('COLLECTION UPDATED');
-                    }
-                    return [3 /*break*/, 5];
-                case 3:
-                    checkCollectionType_1.forEach(function (e) { return __awaiter(void 0, void 0, void 0, function () {
-                        var collectionTypePayload;
-                        return __generator(this, function (_b) {
-                            switch (_b.label) {
-                                case 0:
-                                    collectionTypePayload = {
-                                        old_id: e.code,
-                                        category: e.category,
-                                        success: e.success,
-                                        description: e.description,
-                                    };
-                                    return [4 /*yield*/, collection_type_model_1.default.create(collectionTypePayload)];
-                                case 1:
-                                    _b.sent();
-                                    return [2 /*return*/];
-                            }
-                        });
-                    }); });
-                    console.log('COLLECTION CREATED');
-                    countPayload = {
-                        count: checkCollectionType_1.length,
-                        category: doc_count_interface_1.ICountCategory.COLLECTION_TYPE,
-                    };
-                    return [4 /*yield*/, doc_count_model_1.default.create(countPayload)];
-                case 4:
-                    _b.sent();
-                    _b.label = 5;
-                case 5: return [3 /*break*/, 7];
-                case 6:
-                    err_1 = _b.sent();
-                    console.log(err_1.message);
-                    return [3 /*break*/, 7];
-                case 7: return [2 /*return*/];
-            }
-        });
-    }); };
+    // public static collectionTypePipeline = async () => {
+    //   try {
+    //     const collectionTypeRepository = getRepository(collection_type, 'UTILITYAPPDB');
+    //     // Check count of documents in NIBSS MYSQL Database
+    //     let checkCollectionType = await collectionTypeRepository.find();
+    //     // Get previous count data from MONGO Database
+    //     let getCount: any = await DocCount.findOne({ category: ICountCategory.COLLECTION_TYPE });
+    //     // If count is not null
+    //     if (getCount !== null) {
+    //       // If NIBSS data is more than the previous count, update
+    //       if (checkCollectionType.length > getCount.count) {
+    //         checkCollectionType.forEach(async (e: any) => {
+    //           let result = await CollectionType.updateMany(
+    //             { old_id: e.code },
+    //             {
+    //               $setOnInsert: {
+    //                 old_id: e.code,
+    //                 category: e.category,
+    //                 success: e.success,
+    //                 description: e.description,
+    //               },
+    //             },
+    //             { upsert: true }
+    //           );
+    //           if (result.upsertedCount > 0) {
+    //             await DocCount.findByIdAndUpdate(
+    //               { _id: getCount._id },
+    //               { count: checkCollectionType.length }
+    //             );
+    //           }
+    //         });
+    //         console.log('COLLECTION UPDATED');
+    //       }
+    //     } else {
+    //       checkCollectionType.forEach(async (e: any) => {
+    //         const collectionTypePayload: ICollectionType = {
+    //           old_id: e.code,
+    //           category: e.category,
+    //           success: e.success,
+    //           description: e.description,
+    //         };
+    //         await CollectionType.create(collectionTypePayload);
+    //       });
+    //       console.log('COLLECTION CREATED');
+    //       const countPayload: IDocCount = {
+    //         count: checkCollectionType.length,
+    //         category: ICountCategory.COLLECTION_TYPE,
+    //       };
+    //       await DocCount.create(countPayload);
+    //     }
+    //   } catch (err: any) {
+    //     console.log(err.message);
+    //   }
+    // };
     TransactionController.posTransactionPipeline = function () { return __awaiter(void 0, void 0, void 0, function () {
-        var transactionPosRepository, checkTransaction, getCount, countPayload, checkStoreLoop, i, getCollectionType, collection_id, getDailyMatch, dailyTransactionPayload, getMonthlyMatch, monthlyTransactionPayload, getYearlyMatch, yearlyTransactionPayload, err_2;
+        var transactionPosRepository, checkTransaction, getCount, countPayload, checkStoreLoop, i, getCollectionType, collection_id, getDailyMatch, dailyTransactionPayload, getMonthlyMatch, monthlyTransactionPayload, getYearlyMatch, yearlyTransactionPayload, err_1;
         var _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o;
         return __generator(_a, function (_p) {
             switch (_p.label) {
@@ -320,7 +284,7 @@ var TransactionController = /** @class */ (function () {
                 case 6:
                     if (!(i < checkStoreLoop.length)) return [3 /*break*/, 25];
                     return [4 /*yield*/, collection_type_model_1.default.findOne({
-                            code: checkStoreLoop[i].CollectionType,
+                            old_id: checkStoreLoop[i].CollectionType,
                         })];
                 case 7:
                     getCollectionType = _p.sent();
@@ -480,15 +444,15 @@ var TransactionController = /** @class */ (function () {
                     return [3 /*break*/, 6];
                 case 25: return [3 /*break*/, 27];
                 case 26:
-                    err_2 = _p.sent();
-                    console.log(err_2.message);
+                    err_1 = _p.sent();
+                    console.log(err_1.message);
                     return [3 /*break*/, 27];
                 case 27: return [2 /*return*/];
             }
         });
     }); };
     TransactionController.nipTransactionPipeline = function () { return __awaiter(void 0, void 0, void 0, function () {
-        var transactionNipRepository, checkTransaction, getCount, countPayload, checkStoreLoop, i, getCollectionType, collection_id, getDailyMatch, dailyTransactionPayload, getMonthlyMatch, monthlyTransactionPayload, getYearlyMatch, yearlyTransactionPayload, err_3;
+        var transactionNipRepository, checkTransaction, getCount, countPayload, checkStoreLoop, i, getCollectionType, collection_id, getDailyMatch, dailyTransactionPayload, getMonthlyMatch, monthlyTransactionPayload, getYearlyMatch, yearlyTransactionPayload, err_2;
         var _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o;
         return __generator(_a, function (_p) {
             switch (_p.label) {
@@ -526,7 +490,7 @@ var TransactionController = /** @class */ (function () {
                 case 6:
                     if (!(i < checkStoreLoop.length)) return [3 /*break*/, 25];
                     return [4 /*yield*/, collection_type_model_1.default.findOne({
-                            code: checkStoreLoop[i].CollectionType,
+                            old_id: checkStoreLoop[i].CollectionType,
                         })];
                 case 7:
                     getCollectionType = _p.sent();
@@ -686,8 +650,8 @@ var TransactionController = /** @class */ (function () {
                     return [3 /*break*/, 6];
                 case 25: return [3 /*break*/, 27];
                 case 26:
-                    err_3 = _p.sent();
-                    console.log(err_3.message);
+                    err_2 = _p.sent();
+                    console.log(err_2.message);
                     return [3 /*break*/, 27];
                 case 27: return [2 /*return*/];
             }
@@ -701,7 +665,6 @@ node_cron_1.default.schedule(String(process.env.CRON), function () { return __aw
     return __generator(this, function (_b) {
         TransactionController.posTransactionPipeline();
         TransactionController.nipTransactionPipeline();
-        TransactionController.collectionTypePipeline();
         return [2 /*return*/];
     });
 }); });

@@ -1,6 +1,5 @@
 import cron from 'node-cron';
 import CollectionType from '../models/collection_type.model';
-import { ICollectionType } from '../interfaces/collection_type.interface';
 
 // Collection Type List to be seeded
 const CollectionList = [
@@ -37,8 +36,6 @@ const seedCollection = () => {
       let checkCollectionType = await CollectionType.findOne({
         old_id: collection.old_id,
       });
-
-      //   console.log('SUUFFUFUFFUFUFUF', checkCollectionType);
 
       if (checkCollectionType) {
         console.log(

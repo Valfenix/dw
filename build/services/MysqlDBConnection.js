@@ -47,7 +47,7 @@ var nfs_nip_bank_list_1 = __importDefault(require("../Entities/nfs_nip_bank_list
 var nfs_pos_1 = __importDefault(require("../Entities/nfs_pos"));
 var nfs_nip_trans_1 = __importDefault(require("../Entities/nfs_nip_trans"));
 var document_store_1 = __importDefault(require("../Entities/document_store"));
-var collection_type_1 = __importDefault(require("../Entities/collection_type"));
+// import collection_type from '../Entities/collection_type';
 var logger_1 = __importDefault(require("../lib/logger"));
 var constants_1 = require("../config/constants");
 // import config from '../config/config';
@@ -106,7 +106,11 @@ var DatabaseService = /** @class */ (function () {
                                 database: String(process.env.MYSQL_DB_DATABASE1),
                                 synchronize: true,
                                 logging: false,
-                                entities: [nfs_pos_bank_list_1.default, nfs_pos_1.default, collection_type_1.default],
+                                entities: [
+                                    nfs_pos_bank_list_1.default,
+                                    nfs_pos_1.default,
+                                    //  collection_type
+                                ],
                             },
                             {
                                 name: 'NIPDB',
@@ -118,7 +122,11 @@ var DatabaseService = /** @class */ (function () {
                                 database: String(process.env.MYSQL_DB_DATABASE2),
                                 synchronize: true,
                                 logging: false,
-                                entities: [nfs_nip_bank_list_1.default, collection_type_1.default, nfs_nip_trans_1.default],
+                                entities: [
+                                    nfs_nip_bank_list_1.default,
+                                    //  collection_type,
+                                    nfs_nip_trans_1.default,
+                                ],
                             },
                             {
                                 name: 'POSTGRES',
