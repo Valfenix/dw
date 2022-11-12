@@ -1,8 +1,17 @@
-import { Entity, PrimaryColumn, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 
 @Entity('nfs_nip_trans')
 export class nfs_nip_trans {
-  @PrimaryColumn({ default: null })
+  @PrimaryGeneratedColumn()
+  public id!: number;
+
+  @Column({ default: null })
   public TransactionDate!: Date;
 
   @Column({ default: null })
