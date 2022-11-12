@@ -42,16 +42,6 @@ var nfs_pos = /** @class */ (function () {
         (0, typeorm_1.Column)({ type: 'decimal', precision: 18, scale: 2, nullable: true }),
         __metadata("design:type", Number)
     ], nfs_pos.prototype, "value_", void 0);
-    __decorate([
-        (0, typeorm_1.Column)(),
-        (0, typeorm_1.CreateDateColumn)(),
-        __metadata("design:type", Date)
-    ], nfs_pos.prototype, "createdAt", void 0);
-    __decorate([
-        (0, typeorm_1.Column)(),
-        (0, typeorm_1.UpdateDateColumn)(),
-        __metadata("design:type", Date)
-    ], nfs_pos.prototype, "updatedAt", void 0);
     nfs_pos = __decorate([
         (0, typeorm_1.Entity)('nfs_pos')
     ], nfs_pos);

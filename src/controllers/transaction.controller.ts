@@ -243,7 +243,7 @@ class TransactionController {
           // If the time created is higher than the count doc, we proceed
 
           let checkStoreLoop: any = await transactionPosRepository.find({
-            createdAt: MoreThan(getCount.updatedAt),
+            TransactionDate: MoreThan(getCount.updatedAt),
           });
           for (let i = 0; i < checkStoreLoop.length; i++) {
             let getCollectionType = await CollectionType.findOne({
@@ -435,7 +435,7 @@ class TransactionController {
           // If the time created is higher than the count doc, we proceed
 
           let checkStoreLoop: any = await transactionNipRepository.find({
-            createdAt: MoreThan(getCount.updatedAt),
+            TransactionDate: MoreThan(getCount.updatedAt),
           });
           for (let i = 0; i < checkStoreLoop.length; i++) {
             let getCollectionType = await CollectionType.findOne({

@@ -11,113 +11,109 @@ import nfs_pos_bank_list from '../Entities/nfs_pos_bank_list';
 import nfs_nip_bank_list from '../Entities/nfs_nip_bank_list';
 
 class BankController {
-  public static createPosBank = async (req: Request, res: Response) => {
-    const { bankname, bank_code, bank_category } = req.body;
+  // public static createPosBank = async (req: Request, res: Response) => {
+  //   const { bankname } = req.body;
 
-    const bankSchema = Joi.object({
-      bankname: Joi.string().required(),
-      bank_code: Joi.number().required(),
-      bank_category: Joi.string().required(),
-    }).unknown();
+  //   const bankSchema = Joi.object({
+  //     bankname: Joi.string().required(),
+  //   }).unknown();
 
-    const { error } = bankSchema.validate({ ...req.body });
+  //   const { error } = bankSchema.validate({ ...req.body });
 
-    if (error) {
-      return res.status(400).json({
-        success: false,
-        statusCode: 400,
-        message: error.details[0].message,
-      });
-    }
+  //   if (error) {
+  //     return res.status(400).json({
+  //       success: false,
+  //       statusCode: 400,
+  //       message: error.details[0].message,
+  //     });
+  //   }
 
-    const bankPosRepository = getRepository(nfs_pos_bank_list, 'UTILITYAPPDB');
-    const bankNipRepository = getRepository(nfs_nip_bank_list, 'NIPDB');
+  //   const bankPosRepository = getRepository(nfs_pos_bank_list, 'UTILITYAPPDB');
+  //   const bankNipRepository = getRepository(nfs_nip_bank_list, 'NIPDB');
 
-    let checkPosBank = await bankPosRepository.findOne({
-      where: { bank_code },
-    });
+  //   let checkPosBank = await bankPosRepository.findOne({
+  //     where: { bank_code },
+  //   });
 
-    let checkNipBank = await bankNipRepository.findOne({
-      where: { bank_code },
-    });
+  //   let checkNipBank = await bankNipRepository.findOne({
+  //     where: { bank_code },
+  //   });
 
-    if (checkPosBank || checkNipBank) {
-      return res.status(409).json({
-        success: false,
-        statusCode: 409,
-        message: 'Bank exists already',
-      });
-    }
+  //   if (checkPosBank || checkNipBank) {
+  //     return res.status(409).json({
+  //       success: false,
+  //       statusCode: 409,
+  //       message: 'Bank exists already',
+  //     });
+  //   }
 
-    const bank = new nfs_pos_bank_list();
+  //   const bank = new nfs_pos_bank_list();
 
-    bank.bankname = bankname;
-    bank.bank_code = bank_code;
-    bank.bank_category = bank_category;
+  //   bank.bankname = bankname;
 
-    let result = await bankPosRepository.save(bank);
+  //   let result = await bankPosRepository.save(bank);
 
-    res.status(201).json({
-      success: true,
-      statusCode: 201,
-      message: `Bank created successfully`,
-      data: result,
-    });
-  };
+  //   res.status(201).json({
+  //     success: true,
+  //     statusCode: 201,
+  //     message: `Bank created successfully`,
+  //     data: result,
+  //   });
+  // };
 
-  public static createNipBank = async (req: Request, res: Response) => {
-    const { bankname, bank_code, bank_category } = req.body;
+  // public static createNipBank = async (req: Request, res: Response) => {
+  //   const { bankname, bank_code } = req.body;
 
-    const bankSchema = Joi.object({
-      bankname: Joi.string().required(),
-      bank_code: Joi.number().required(),
-      bank_category: Joi.string().required(),
-    }).unknown();
+  //   const bankSchema = Joi.object({
+  //     bankname: Joi.string().required(),
+  //     bank_code: Joi.number().required(),
+  //     bank_category: Joi.string().required(),
+  //   }).unknown();
 
-    const { error } = bankSchema.validate({ ...req.body });
+  //   const { error } = bankSchema.validate({ ...req.body });
 
-    if (error) {
-      return res.status(400).json({
-        success: false,
-        statusCode: 400,
-        message: error.details[0].message,
-      });
-    }
+  //   if (error) {
+  //     return res.status(400).json({
+  //       success: false,
+  //       statusCode: 400,
+  //       message: error.details[0].message,
+  //     });
+  //   }
 
-    const bankNipRepository = getRepository(nfs_nip_bank_list, 'NIPDB');
-    const bankPosRepository = getRepository(nfs_pos_bank_list, 'UTILITYAPPDB');
+  //   const bankNipRepository = getRepository(nfs_nip_bank_list, 'NIPDB');
+  //   const bankPosRepository = getRepository(nfs_pos_bank_list, 'UTILITYAPPDB');
 
-    let checkNipBank = await bankNipRepository.findOne({
-      where: { bank_code },
-    });
+  //   let checkNipBank = await bankNipRepository.findOne({
+  //     where: { bank_code },
+  //   });
 
-    let checkPosBank = await bankPosRepository.findOne({
-      where: { bank_code },
-    });
+  //   let checkPosBank = await bankPosRepository.findOne({
+  //     where: { bank_code },
+  //   });
 
-    if (checkNipBank || checkPosBank) {
-      return res.status(409).json({
-        success: false,
-        statusCode: 409,
-        message: 'Bank exists already',
-      });
-    }
+  //   if (checkNipBank || checkPosBank) {
+  //     return res.status(409).json({
+  //       success: false,
+  //       statusCode: 409,
+  //       message: 'Bank exists already',
+  //     });
+  //   }
 
-    const bank = new nfs_nip_bank_list();
+  //   const bank = new nfs_nip_bank_list();
 
-    bank.bankname = bankname;
-    bank.bank_code = bank_code;
-    bank.bank_category = bank_category;
+  //   bank.bankname = bankname;
+  //   // bank.bank_code = bank_code;
+  //   // bank.bank_category = bank_category;
 
-    let result = await bankNipRepository.save(bank);
+  //   let result = await bankNipRepository.save(bank);
 
-    res.status(201).json({
-      success: true,
-      statusCode: 201,
-      message: `Bank created successfully`,
-      data: result,
-    });
-  };
+  //   res.status(201).json({
+  //     success: true,
+  //     statusCode: 201,
+  //     message: `Bank created successfully`,
+  //     data: result,
+  //   });
+  // };
 
   public static bankListPipelinePos = async () => {
     try {
@@ -136,12 +132,10 @@ class BankController {
         if (checkBank.length > getCount.count) {
           checkBank.forEach(async (e: any) => {
             let result = await Bank.updateMany(
-              { bank_code: e.bank_code },
+              { name: e.bankname },
               {
                 $setOnInsert: {
                   name: e.bankname,
-                  bank_code: e.bank_code,
-                  bank_category: e.bank_category,
                 },
               },
               { upsert: true }
@@ -157,8 +151,8 @@ class BankController {
         checkBank.forEach(async (e: any) => {
           const bankPayload: IBank = {
             name: e.bankname,
-            bank_code: e.bank_code,
-            bank_category: e.bank_category,
+            // bank_code: e.bank_code,
+            // bank_category: e.bank_category,
           };
           await Bank.create(bankPayload);
         });
@@ -193,12 +187,12 @@ class BankController {
         if (checkBank.length > getCount.count) {
           checkBank.forEach(async (e: any) => {
             let result = await Bank.updateMany(
-              { bank_code: e.bank_code },
+              { name: e.bankname },
               {
                 $setOnInsert: {
                   name: e.bankname,
-                  bank_code: e.bank_code,
-                  bank_category: e.bank_category,
+                  // bank_code: e.bank_code,
+                  // bank_category: e.bank_category,
                 },
               },
               { upsert: true }
@@ -214,8 +208,8 @@ class BankController {
         checkBank.forEach(async (e: any) => {
           const bankPayload: IBank = {
             name: e.bankname,
-            bank_code: e.bank_code,
-            bank_category: e.bank_category,
+            // bank_code: e.bank_code,
+            // bank_category: e.bank_category,
           };
           await Bank.create(bankPayload);
         });

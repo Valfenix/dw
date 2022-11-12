@@ -29,13 +29,13 @@ export class nfs_pos {
   @Column({ type: 'decimal', precision: 18, scale: 2, nullable: true })
   public value_!: number;
 
-  @Column()
-  @CreateDateColumn()
-  public createdAt!: Date;
+  // @Column()
+  // @CreateDateColumn()
+  // public createdAt!: Date;
 
-  @Column()
-  @UpdateDateColumn()
-  public updatedAt!: Date;
+  // @Column()
+  // @UpdateDateColumn()
+  // public updatedAt!: Date;
 }
 
 export default nfs_pos;

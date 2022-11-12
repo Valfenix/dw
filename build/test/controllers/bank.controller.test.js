@@ -124,10 +124,12 @@ describe('POST /bank', function () {
                     jest.setTimeout(10000);
                     bank = new nfs_pos_bank_list_1.default();
                     bank.bankname = 'Zenith Bank';
-                    bank.bank_code = 190884;
-                    bank.bank_category = 'DMB';
+                    // bank.bank_code = 190884;
+                    // bank.bank_category = 'DMB';
                     return [4 /*yield*/, bankPosRepository.save(bank)];
                 case 1:
+                    // bank.bank_code = 190884;
+                    // bank.bank_category = 'DMB';
                     _a.sent();
                     return [4 /*yield*/, (0, supertest_1.default)(index_1.default).post('/api/v2/bank/create-pos').send({
                             bankname: 'Zenith Bank',
@@ -149,10 +151,12 @@ describe('POST /bank', function () {
                     jest.setTimeout(10000);
                     bank = new nfs_pos_bank_list_1.default();
                     bank.bankname = 'Zenith Bank';
-                    bank.bank_code = 190886;
-                    bank.bank_category = 'DMB';
+                    // bank.bank_code = 190886;
+                    // bank.bank_category = 'DMB';
                     return [4 /*yield*/, bankNipRepository.save(bank)];
                 case 1:
+                    // bank.bank_code = 190886;
+                    // bank.bank_category = 'DMB';
                     _a.sent();
                     return [4 /*yield*/, (0, supertest_1.default)(index_1.default).post('/api/v2/bank/create-nip').send({
                             bankname: 'Zenith Bank',
@@ -216,10 +220,12 @@ describe('POST /bank', function () {
                     jest.setTimeout(10000);
                     bank = new nfs_pos_bank_list_1.default();
                     bank.bankname = 'Zenith Bank';
-                    bank.bank_code = 190884;
-                    bank.bank_category = 'DMB';
+                    // bank.bank_code = 190884;
+                    // bank.bank_category = 'DMB';
                     return [4 /*yield*/, bankPosRepository.save(bank)];
                 case 1:
+                    // bank.bank_code = 190884;
+                    // bank.bank_category = 'DMB';
                     _a.sent();
                     check = { schedule: jest.fn() };
                     logSpy = jest.spyOn(console, 'log');
@@ -245,10 +251,12 @@ describe('POST /bank', function () {
                     jest.setTimeout(10000);
                     bank = new nfs_pos_bank_list_1.default();
                     bank.bankname = 'Zenith Bank';
-                    bank.bank_code = 190884;
-                    bank.bank_category = 'DMB';
+                    // bank.bank_code = 190884;
+                    // bank.bank_category = 'DMB';
                     return [4 /*yield*/, bankNipRepository.save(bank)];
                 case 1:
+                    // bank.bank_code = 190884;
+                    // bank.bank_category = 'DMB';
                     _a.sent();
                     check = { schedule: jest.fn() };
                     logSpy = jest.spyOn(console, 'log');

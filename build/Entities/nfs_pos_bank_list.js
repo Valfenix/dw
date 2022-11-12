@@ -22,24 +22,6 @@ var nfs_pos_bank_list = /** @class */ (function () {
         (0, typeorm_1.Column)({ default: null }),
         __metadata("design:type", String)
     ], nfs_pos_bank_list.prototype, "bankname", void 0);
-    __decorate([
-        (0, typeorm_1.Column)({ default: null }),
-        __metadata("design:type", Number)
-    ], nfs_pos_bank_list.prototype, "bank_code", void 0);
-    __decorate([
-        (0, typeorm_1.Column)({ default: null }),
-        __metadata("design:type", String)
-    ], nfs_pos_bank_list.prototype, "bank_category", void 0);
-    __decorate([
-        (0, typeorm_1.Column)(),
-        (0, typeorm_1.CreateDateColumn)(),
-        __metadata("design:type", Date)
-    ], nfs_pos_bank_list.prototype, "createdAt", void 0);
-    __decorate([
-        (0, typeorm_1.Column)(),
-        (0, typeorm_1.UpdateDateColumn)(),
-        __metadata("design:type", Date)
-    ], nfs_pos_bank_list.prototype, "updatedAt", void 0);
     nfs_pos_bank_list = __decorate([
         (0, typeorm_1.Entity)('nfs_pos_bank_list')
     ], nfs_pos_bank_list);

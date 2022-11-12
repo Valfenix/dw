@@ -43,8 +43,8 @@ describe('POST /bank', () => {
     jest.setTimeout(10000);
     const bank = new nfs_pos_bank_list();
     bank.bankname = 'Zenith Bank';
-    bank.bank_code = 190884;
-    bank.bank_category = 'DMB';
+    // bank.bank_code = 190884;
+    // bank.bank_category = 'DMB';
 
     await bankPosRepository.save(bank);
 
@@ -61,8 +61,8 @@ describe('POST /bank', () => {
     jest.setTimeout(10000);
     const bank = new nfs_pos_bank_list();
     bank.bankname = 'Zenith Bank';
-    bank.bank_code = 190886;
-    bank.bank_category = 'DMB';
+    // bank.bank_code = 190886;
+    // bank.bank_category = 'DMB';
 
     await bankNipRepository.save(bank);
 
@@ -107,8 +107,8 @@ describe('POST /bank', () => {
     jest.setTimeout(10000);
     const bank = new nfs_pos_bank_list();
     bank.bankname = 'Zenith Bank';
-    bank.bank_code = 190884;
-    bank.bank_category = 'DMB';
+    // bank.bank_code = 190884;
+    // bank.bank_category = 'DMB';
 
     await bankPosRepository.save(bank);
 
@@ -123,8 +123,8 @@ describe('POST /bank', () => {
     jest.setTimeout(10000);
     const bank = new nfs_pos_bank_list();
     bank.bankname = 'Zenith Bank';
-    bank.bank_code = 190884;
-    bank.bank_category = 'DMB';
+    // bank.bank_code = 190884;
+    // bank.bank_category = 'DMB';
 
     await bankNipRepository.save(bank);
 

@@ -275,7 +275,7 @@ var TransactionController = /** @class */ (function () {
                     if (!getCount) return [3 /*break*/, 25];
                     if (!(getCount.count < checkTransaction.length)) return [3 /*break*/, 25];
                     return [4 /*yield*/, transactionPosRepository.find({
-                            createdAt: (0, typeorm_1.MoreThan)(getCount.updatedAt),
+                            TransactionDate: (0, typeorm_1.MoreThan)(getCount.updatedAt),
                         })];
                 case 5:
                     checkStoreLoop = _p.sent();
@@ -481,7 +481,7 @@ var TransactionController = /** @class */ (function () {
                     if (!getCount) return [3 /*break*/, 25];
                     if (!(getCount.count < checkTransaction.length)) return [3 /*break*/, 25];
                     return [4 /*yield*/, transactionNipRepository.find({
-                            createdAt: (0, typeorm_1.MoreThan)(getCount.updatedAt),
+                            TransactionDate: (0, typeorm_1.MoreThan)(getCount.updatedAt),
                         })];
                 case 5:
                     checkStoreLoop = _p.sent();

@@ -1,15 +1,4 @@
 "use strict";
-var __assign = (this && this.__assign) || function () {
-    __assign = Object.assign || function(t) {
-        for (var s, i = 1, n = arguments.length; i < n; i++) {
-            s = arguments[i];
-            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
-                t[p] = s[p];
-        }
-        return t;
-    };
-    return __assign.apply(this, arguments);
-};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -50,7 +39,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var joi_1 = __importDefault(require("joi"));
 var typeorm_1 = require("typeorm");
 var bank_model_1 = __importDefault(require("../models/bank.model"));
 var doc_count_model_1 = __importDefault(require("../models/doc_count.model"));
@@ -63,116 +51,86 @@ var BankController = /** @class */ (function () {
     }
     var _a;
     _a = BankController;
-    BankController.createPosBank = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-        var _b, bankname, bank_code, bank_category, bankSchema, error, bankPosRepository, bankNipRepository, checkPosBank, checkNipBank, bank, result;
-        return __generator(_a, function (_c) {
-            switch (_c.label) {
-                case 0:
-                    _b = req.body, bankname = _b.bankname, bank_code = _b.bank_code, bank_category = _b.bank_category;
-                    bankSchema = joi_1.default.object({
-                        bankname: joi_1.default.string().required(),
-                        bank_code: joi_1.default.number().required(),
-                        bank_category: joi_1.default.string().required(),
-                    }).unknown();
-                    error = bankSchema.validate(__assign({}, req.body)).error;
-                    if (error) {
-                        return [2 /*return*/, res.status(400).json({
-                                success: false,
-                                statusCode: 400,
-                                message: error.details[0].message,
-                            })];
-                    }
-                    bankPosRepository = (0, typeorm_1.getRepository)(nfs_pos_bank_list_1.default, 'UTILITYAPPDB');
-                    bankNipRepository = (0, typeorm_1.getRepository)(nfs_nip_bank_list_1.default, 'NIPDB');
-                    return [4 /*yield*/, bankPosRepository.findOne({
-                            where: { bank_code: bank_code },
-                        })];
-                case 1:
-                    checkPosBank = _c.sent();
-                    return [4 /*yield*/, bankNipRepository.findOne({
-                            where: { bank_code: bank_code },
-                        })];
-                case 2:
-                    checkNipBank = _c.sent();
-                    if (checkPosBank || checkNipBank) {
-                        return [2 /*return*/, res.status(409).json({
-                                success: false,
-                                statusCode: 409,
-                                message: 'Bank exists already',
-                            })];
-                    }
-                    bank = new nfs_pos_bank_list_1.default();
-                    bank.bankname = bankname;
-                    bank.bank_code = bank_code;
-                    bank.bank_category = bank_category;
-                    return [4 /*yield*/, bankPosRepository.save(bank)];
-                case 3:
-                    result = _c.sent();
-                    res.status(201).json({
-                        success: true,
-                        statusCode: 201,
-                        message: "Bank created successfully",
-                        data: result,
-                    });
-                    return [2 /*return*/];
-            }
-        });
-    }); };
-    BankController.createNipBank = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-        var _b, bankname, bank_code, bank_category, bankSchema, error, bankNipRepository, bankPosRepository, checkNipBank, checkPosBank, bank, result;
-        return __generator(_a, function (_c) {
-            switch (_c.label) {
-                case 0:
-                    _b = req.body, bankname = _b.bankname, bank_code = _b.bank_code, bank_category = _b.bank_category;
-                    bankSchema = joi_1.default.object({
-                        bankname: joi_1.default.string().required(),
-                        bank_code: joi_1.default.number().required(),
-                        bank_category: joi_1.default.string().required(),
-                    }).unknown();
-                    error = bankSchema.validate(__assign({}, req.body)).error;
-                    if (error) {
-                        return [2 /*return*/, res.status(400).json({
-                                success: false,
-                                statusCode: 400,
-                                message: error.details[0].message,
-                            })];
-                    }
-                    bankNipRepository = (0, typeorm_1.getRepository)(nfs_nip_bank_list_1.default, 'NIPDB');
-                    bankPosRepository = (0, typeorm_1.getRepository)(nfs_pos_bank_list_1.default, 'UTILITYAPPDB');
-                    return [4 /*yield*/, bankNipRepository.findOne({
-                            where: { bank_code: bank_code },
-                        })];
-                case 1:
-                    checkNipBank = _c.sent();
-                    return [4 /*yield*/, bankPosRepository.findOne({
-                            where: { bank_code: bank_code },
-                        })];
-                case 2:
-                    checkPosBank = _c.sent();
-                    if (checkNipBank || checkPosBank) {
-                        return [2 /*return*/, res.status(409).json({
-                                success: false,
-                                statusCode: 409,
-                                message: 'Bank exists already',
-                            })];
-                    }
-                    bank = new nfs_nip_bank_list_1.default();
-                    bank.bankname = bankname;
-                    bank.bank_code = bank_code;
-                    bank.bank_category = bank_category;
-                    return [4 /*yield*/, bankNipRepository.save(bank)];
-                case 3:
-                    result = _c.sent();
-                    res.status(201).json({
-                        success: true,
-                        statusCode: 201,
-                        message: "Bank created successfully",
-                        data: result,
-                    });
-                    return [2 /*return*/];
-            }
-        });
-    }); };
+    // public static createPosBank = async (req: Request, res: Response) => {
+    //   const { bankname } = req.body;
+    //   const bankSchema = Joi.object({
+    //     bankname: Joi.string().required(),
+    //   }).unknown();
+    //   const { error } = bankSchema.validate({ ...req.body });
+    //   if (error) {
+    //     return res.status(400).json({
+    //       success: false,
+    //       statusCode: 400,
+    //       message: error.details[0].message,
+    //     });
+    //   }
+    //   const bankPosRepository = getRepository(nfs_pos_bank_list, 'UTILITYAPPDB');
+    //   const bankNipRepository = getRepository(nfs_nip_bank_list, 'NIPDB');
+    //   let checkPosBank = await bankPosRepository.findOne({
+    //     where: { bank_code },
+    //   });
+    //   let checkNipBank = await bankNipRepository.findOne({
+    //     where: { bank_code },
+    //   });
+    //   if (checkPosBank || checkNipBank) {
+    //     return res.status(409).json({
+    //       success: false,
+    //       statusCode: 409,
+    //       message: 'Bank exists already',
+    //     });
+    //   }
+    //   const bank = new nfs_pos_bank_list();
+    //   bank.bankname = bankname;
+    //   let result = await bankPosRepository.save(bank);
+    //   res.status(201).json({
+    //     success: true,
+    //     statusCode: 201,
+    //     message: `Bank created successfully`,
+    //     data: result,
+    //   });
+    // };
+    // public static createNipBank = async (req: Request, res: Response) => {
+    //   const { bankname, bank_code } = req.body;
+    //   const bankSchema = Joi.object({
+    //     bankname: Joi.string().required(),
+    //     bank_code: Joi.number().required(),
+    //     bank_category: Joi.string().required(),
+    //   }).unknown();
+    //   const { error } = bankSchema.validate({ ...req.body });
+    //   if (error) {
+    //     return res.status(400).json({
+    //       success: false,
+    //       statusCode: 400,
+    //       message: error.details[0].message,
+    //     });
+    //   }
+    //   const bankNipRepository = getRepository(nfs_nip_bank_list, 'NIPDB');
+    //   const bankPosRepository = getRepository(nfs_pos_bank_list, 'UTILITYAPPDB');
+    //   let checkNipBank = await bankNipRepository.findOne({
+    //     where: { bank_code },
+    //   });
+    //   let checkPosBank = await bankPosRepository.findOne({
+    //     where: { bank_code },
+    //   });
+    //   if (checkNipBank || checkPosBank) {
+    //     return res.status(409).json({
+    //       success: false,
+    //       statusCode: 409,
+    //       message: 'Bank exists already',
+    //     });
+    //   }
+    //   const bank = new nfs_nip_bank_list();
+    //   bank.bankname = bankname;
+    //   // bank.bank_code = bank_code;
+    //   // bank.bank_category = bank_category;
+    //   let result = await bankNipRepository.save(bank);
+    //   res.status(201).json({
+    //     success: true,
+    //     statusCode: 201,
+    //     message: `Bank created successfully`,
+    //     data: result,
+    //   });
+    // };
     BankController.bankListPipelinePos = function () { return __awaiter(void 0, void 0, void 0, function () {
         var bankRepository, checkBank_1, getCount_1, countPayload, err_1;
         return __generator(_a, function (_b) {
@@ -193,11 +151,9 @@ var BankController = /** @class */ (function () {
                             var result;
                             return __generator(this, function (_b) {
                                 switch (_b.label) {
-                                    case 0: return [4 /*yield*/, bank_model_1.default.updateMany({ bank_code: e.bank_code }, {
+                                    case 0: return [4 /*yield*/, bank_model_1.default.updateMany({ name: e.bankname }, {
                                             $setOnInsert: {
                                                 name: e.bankname,
-                                                bank_code: e.bank_code,
-                                                bank_category: e.bank_category,
                                             },
                                         }, { upsert: true })];
                                     case 1:
@@ -222,8 +178,8 @@ var BankController = /** @class */ (function () {
                                 case 0:
                                     bankPayload = {
                                         name: e.bankname,
-                                        bank_code: e.bank_code,
-                                        bank_category: e.bank_category,
+                                        // bank_code: e.bank_code,
+                                        // bank_category: e.bank_category,
                                     };
                                     return [4 /*yield*/, bank_model_1.default.create(bankPayload)];
                                 case 1:
@@ -270,11 +226,11 @@ var BankController = /** @class */ (function () {
                             var result;
                             return __generator(this, function (_b) {
                                 switch (_b.label) {
-                                    case 0: return [4 /*yield*/, bank_model_1.default.updateMany({ bank_code: e.bank_code }, {
+                                    case 0: return [4 /*yield*/, bank_model_1.default.updateMany({ name: e.bankname }, {
                                             $setOnInsert: {
                                                 name: e.bankname,
-                                                bank_code: e.bank_code,
-                                                bank_category: e.bank_category,
+                                                // bank_code: e.bank_code,
+                                                // bank_category: e.bank_category,
                                             },
                                         }, { upsert: true })];
                                     case 1:
@@ -299,8 +255,8 @@ var BankController = /** @class */ (function () {
                                 case 0:
                                     bankPayload = {
                                         name: e.bankname,
-                                        bank_code: e.bank_code,
-                                        bank_category: e.bank_category,
+                                        // bank_code: e.bank_code,
+                                        // bank_category: e.bank_category,
                                     };
                                     return [4 /*yield*/, bank_model_1.default.create(bankPayload)];
                                 case 1:

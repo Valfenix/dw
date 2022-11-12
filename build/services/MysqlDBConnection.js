@@ -104,7 +104,7 @@ var DatabaseService = /** @class */ (function () {
                                 password: String(process.env.MYSQL_DB_PASSWORD1),
                                 port: Number(process.env.MYSQL_DB_PORT1),
                                 database: String(process.env.MYSQL_DB_DATABASE1),
-                                synchronize: true,
+                                synchronize: false,
                                 logging: false,
                                 entities: [
                                     nfs_pos_bank_list_1.default,
@@ -120,7 +120,7 @@ var DatabaseService = /** @class */ (function () {
                                 password: String(process.env.MYSQL_DB_PASSWORD2),
                                 port: Number(process.env.MYSQL_DB_PORT2),
                                 database: String(process.env.MYSQL_DB_DATABASE2),
-                                synchronize: true,
+                                synchronize: false,
                                 logging: false,
                                 entities: [
                                     nfs_nip_bank_list_1.default,
