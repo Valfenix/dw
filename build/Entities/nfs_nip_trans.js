@@ -15,10 +15,6 @@ var nfs_nip_trans = /** @class */ (function () {
     function nfs_nip_trans() {
     }
     __decorate([
-        (0, typeorm_1.PrimaryGeneratedColumn)(),
-        __metadata("design:type", Number)
-    ], nfs_nip_trans.prototype, "id", void 0);
-    __decorate([
         (0, typeorm_1.Column)({ default: null }),
         __metadata("design:type", Date)
     ], nfs_nip_trans.prototype, "TransactionDate", void 0);

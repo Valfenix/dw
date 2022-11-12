@@ -15,10 +15,6 @@ var nfs_pos = /** @class */ (function () {
     function nfs_pos() {
     }
     __decorate([
-        (0, typeorm_1.PrimaryGeneratedColumn)(),
-        __metadata("design:type", Number)
-    ], nfs_pos.prototype, "id", void 0);
-    __decorate([
         (0, typeorm_1.Column)({ default: null }),
         __metadata("design:type", Date)
     ], nfs_pos.prototype, "TransactionDate", void 0);
