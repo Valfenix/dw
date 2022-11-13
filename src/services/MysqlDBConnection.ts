@@ -21,7 +21,7 @@ class DatabaseService {
 
   static async registerEvent() {
     DatabaseService.Emitter.on('DB_CONN_ERROR', async () => {
-      DatabaseService.logger.error('Database connection error... Retrying...');
+      DatabaseService.logger.error('MYSQL Database connection error... Retrying...');
       setTimeout(async () => {
         await DatabaseService.createConnection();
       }, 10000);
@@ -55,71 +55,15 @@ class DatabaseService {
         logging: false,
         entities: [nfs_nip_bank_list, nfs_nip_trans],
       }),
-
-      await createConnection({
-        name: 'POSTGRES',
-        type: 'postgres',
-        host: String(process.env.POSTGRES_DB_HOST),
-        username: String(process.env.POSTGRES_DB_USERNAME),
-        password: String(process.env.POSTGRES_DB_PASSWORD),
-        port: Number(process.env.POSTGRES_DB_PORT),
-        database: String(process.env.POSTGRES_DB_DATABASE),
-        synchronize: false,
-        logging: false,
-        entities: [DocumentStore],
-      }),
     ])
-      // await createConnections([
-      //   {
-      //     name: 'NIPDB',
-      //     type: 'mysql',
-      //     host: String(process.env.MYSQL_DB_HOST2),
-      //     username: String(process.env.MYSQL_DB_USERNAME2),
-      //     password: String(process.env.MYSQL_DB_PASSWORD2),
-      //     port: Number(process.env.MYSQL_DB_PORT2),
-      //     database: String(process.env.MYSQL_DB_DATABASE2),
-      //     synchronize: false,
-      //     logging: false,
-      //     entities: [nfs_nip_bank_list, nfs_nip_trans],
-      //   },
-      //   {
-      //     name: 'NIPDB',
-      //     type: 'mysql',
-      //     host: String(process.env.MYSQL_DB_HOST2),
-      //     username: String(process.env.MYSQL_DB_USERNAME2),
-      //     password: String(process.env.MYSQL_DB_PASSWORD2),
-      //     port: Number(process.env.MYSQL_DB_PORT2),
-      //     database: String(process.env.MYSQL_DB_DATABASE2),
-      //     synchronize: false,
-      //     logging: false,
-      //     entities: [
-      //       nfs_nip_bank_list,
-      //       //  collection_type,
-      //       nfs_nip_trans,
-      //     ],
-      //   },
-      //   {
-      //     name: 'POSTGRES',
-      //     type: 'postgres',
-      //     host: String(process.env.POSTGRES_DB_HOST),
-      //     username: String(process.env.POSTGRES_DB_USERNAME),
-      //     password: String(process.env.POSTGRES_DB_PASSWORD),
-      //     port: Number(process.env.POSTGRES_DB_PORT),
-      //     database: String(process.env.POSTGRES_DB_DATABASE),
-      //     synchronize: false,
-      //     logging: false,
-      //     entities: [DocumentStore],
-      //   },
-      // ])
+
       .then(() => {
-        DatabaseService.logger.info(
-          'Connected to MYSQL UTILITY_APP_DB AND MYSQL NIP_DB & POSTGRES CBN'
-        );
+        DatabaseService.logger.info('Connected to MYSQL UTILITY_APP_DB AND MYSQL NIP_DB');
       })
       .catch((_err: Error) => {
         console.log(_err);
         // now do retry //
-        DatabaseService.logger.error('Database connection error... Retrying...');
+        DatabaseService.logger.error('MYSQL Database connection error... Retrying...');
         DatabaseService.Emitter.emit('DB_CONN_ERROR');
       });
   }

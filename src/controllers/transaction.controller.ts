@@ -602,8 +602,7 @@ class TransactionController {
 export default TransactionController;
 
 // Collection Type Cron Job
-cron.schedule(String(process.env.CRON), async () => {
+cron.schedule(String(process.env.NIBSS_CRON), async () => {
   TransactionController.posTransactionPipeline();
   TransactionController.nipTransactionPipeline();
-  // TransactionController.collectionTypePipeline();
 });

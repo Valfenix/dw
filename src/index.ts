@@ -11,6 +11,7 @@ import routes from './routes/index.routes';
 
 import Logger from './lib/logger';
 // import { PostgresDatabaseService } from './services/PostgreDBConnection';
+import { PostGresDatabaseService } from './services/PostGresDBConnection';
 import { DatabaseService } from './services/MysqlDBConnection';
 import DatabaseMongoService from './services/MongoDBConnection';
 
@@ -40,7 +41,7 @@ router.use(cors());
 
 DatabaseService.getConnection();
 
-// PostgresDatabaseService.getConnection();
+PostGresDatabaseService.getConnection();
 
 DatabaseMongoService.MongooseService();
 
