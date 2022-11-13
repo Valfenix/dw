@@ -14,12 +14,6 @@ export class nfs_pos_bank_list {
   @Column({ default: null })
   public bankname!: string;
 
-  // @Column({ default: null })
-  // public bank_code!: number;
-
-  // @Column({ default: null })
-  // public bank_category!: string;
-
   // @Column()
   // @CreateDateColumn()
   // public createdAt!: Date;

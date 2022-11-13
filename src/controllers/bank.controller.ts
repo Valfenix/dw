@@ -136,6 +136,8 @@ class BankController {
               {
                 $setOnInsert: {
                   name: e.bankname,
+                  bank_code: e.id,
+                  bank_category: 'DMB',
                 },
               },
               { upsert: true }
@@ -151,8 +153,8 @@ class BankController {
         checkBank.forEach(async (e: any) => {
           const bankPayload: IBank = {
             name: e.bankname,
-            // bank_code: e.bank_code,
-            // bank_category: e.bank_category,
+            bank_code: e.id,
+            bank_category: 'DMB',
           };
           await Bank.create(bankPayload);
         });
@@ -191,8 +193,8 @@ class BankController {
               {
                 $setOnInsert: {
                   name: e.bankname,
-                  // bank_code: e.bank_code,
-                  // bank_category: e.bank_category,
+                  bank_code: e.id,
+                  bank_category: 'DMB',
                 },
               },
               { upsert: true }
@@ -208,8 +210,8 @@ class BankController {
         checkBank.forEach(async (e: any) => {
           const bankPayload: IBank = {
             name: e.bankname,
-            // bank_code: e.bank_code,
-            // bank_category: e.bank_category,
+            bank_code: e.id,
+            bank_category: 'DMB',
           };
           await Bank.create(bankPayload);
         });
