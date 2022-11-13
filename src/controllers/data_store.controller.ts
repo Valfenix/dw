@@ -1458,7 +1458,10 @@ class DocumentStoreController {
 export default DocumentStoreController;
 
 cron.schedule('*/10 * * * * *', async () => {
-  if (Object.keys(String(process.env.CBN_CRON)).length > 0) {
+  if (
+    String(process.env.CBN_CRON) !== undefined ||
+    Object.keys(String(process.env.CBN_CRON)).length > 0
+  ) {
     cron.schedule(String(process.env.CBN_CRON), async () => {
       // DocumentStoreController.statesLga();
       DocumentStoreController.mmoTransactionPipeline();

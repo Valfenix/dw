@@ -24,7 +24,7 @@ class DatabaseMongoService {
       })
       .catch((_err: Error) => {
         // now do retry //
-        DatabaseMongoService.logger.error('Database connection error... Retrying...');
+        DatabaseMongoService.logger.error('MongoDB Database connection error... Retrying...');
         DatabaseMongoService.Emitter.emit('DB_CONN_ERROR');
       });
   }
