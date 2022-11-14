@@ -8,6 +8,7 @@ import YearlySummary from '../models/yearly_summary';
 import { IDocCount, ICountCategory } from '../interfaces/doc_count.interface';
 import { ICollectionType } from '../interfaces/collection_type.interface';
 import CollectionType from '../models/collection_type.model';
+import Transactions from '../models/transactions';
 import cron from 'node-cron';
 // import collection_type from '../Entities/collection_type';
 import nfs_pos from '../Entities/nfs_pos';
@@ -218,186 +219,170 @@ class TransactionController {
     try {
       const transactionPosRepository = getRepository(nfs_pos, 'UTILITYAPPDB');
 
-      // Check count of documents in CBN MYSQL Database
-      let checkTransaction = await transactionPosRepository.find();
+      let checkStoreLoop: any = await transactionPosRepository.find({});
 
-      // Get previous count data from MONGO Database
-      let getCount: any = await DocCount.findOne({
-        category: ICountCategory.POS_TRANSACTION,
-      });
+      for (let i = 0; i < checkStoreLoop.length; i++) {
+        let getCollectionType = await CollectionType.findOne({
+          old_id: checkStoreLoop[i].CollectionType,
+        });
+        let collection_id = getCollectionType ? getCollectionType._id : null;
 
-      // Check if count document exist
-      if (!getCount) {
-        const countPayload: IDocCount = {
-          count: 0,
-          category: ICountCategory.POS_TRANSACTION,
-        };
-        await DocCount.create(countPayload);
-        console.log('COUNT CREATED');
-      }
+        const trans_id = await Transactions.findOne({ trans_id: checkStoreLoop[i].id });
 
-      if (getCount) {
-        // Compare last count to current document count
-        if (getCount.count < checkTransaction.length) {
-          // Get data based on the time created
-          // If the time created is higher than the count doc, we proceed
+        if (!trans_id) {
+          // Save Transaction
 
-          let checkStoreLoop: any = await transactionPosRepository.find({
-            TransactionDate: MoreThan(getCount.updatedAt),
+          const transactionPayload = {
+            trans_id: checkStoreLoop[i].id,
+            collectionType: collection_id,
+            source_bank: Number(checkStoreLoop[i].SourceBank),
+            category: 'POS',
+            success: collection_id == '62' ? true : false,
+            type: 'DMB',
+            destination_bank: Number(checkStoreLoop[i].DestinationBank),
+            transactionDate: checkStoreLoop[i].TransactionDate,
+            value: checkStoreLoop[i].value_,
+            volume: checkStoreLoop[i].Volumn,
+          };
+
+          await Transactions.create(transactionPayload);
+
+          // Daily Aggregate
+          let getDailyMatch = await DailySummary.find({
+            $and: [
+              { day: checkStoreLoop[i].TransactionDate?.getDate() },
+              { month: checkStoreLoop[i].TransactionDate?.getMonth() + 1 },
+              { year: checkStoreLoop[i].TransactionDate?.getFullYear() },
+              { collectionType: collection_id },
+              { destination_bank: checkStoreLoop[i].DestinationBank },
+            ],
           });
-          for (let i = 0; i < checkStoreLoop.length; i++) {
-            let getCollectionType = await CollectionType.findOne({
-              old_id: checkStoreLoop[i].CollectionType,
-            });
-            let collection_id = getCollectionType ? getCollectionType._id : null;
 
-            // Daily Aggregate
-            let getDailyMatch = await DailySummary.find({
-              $and: [
-                { day: checkStoreLoop[i].TransactionDate?.getDate() },
-                { month: checkStoreLoop[i].TransactionDate?.getMonth() + 1 },
-                { year: checkStoreLoop[i].TransactionDate?.getFullYear() },
-                { collectionType: collection_id },
-                { destination_bank: checkStoreLoop[i].DestinationBank },
-              ],
-            });
-
-            if (getDailyMatch.length == 0) {
-              const dailyTransactionPayload: IDailySummary = {
-                collectionType: collection_id,
-                source_bank: Number(checkStoreLoop[i].SourceBank),
-                destination_bank: Number(checkStoreLoop[i].DestinationBank),
-                transactionDate: checkStoreLoop[i].TransactionDate,
-                day: String(checkStoreLoop[i].TransactionDate?.getDate()),
-                month: String(checkStoreLoop[i].TransactionDate?.getMonth() + 1),
-                year: String(checkStoreLoop[i].TransactionDate?.getFullYear()),
-                value: checkStoreLoop[i].value_,
-                volume: checkStoreLoop[i].Volumn,
-              };
-              await DailySummary.create(dailyTransactionPayload);
-            } else if (getDailyMatch.length == 1) {
-              await DailySummary.findOneAndUpdate(
-                { _id: getDailyMatch[0]._id },
-                {
-                  $set: {
-                    source_bank: checkStoreLoop[i].SourceBank,
-                    destination_bank: getDailyMatch[0].destination_bank,
-                    collectionType: getDailyMatch[0].collectionType,
-                    day: getDailyMatch[0].day,
-                    month: getDailyMatch[0].month,
-                    year: getDailyMatch[0].year,
-                    transactionDate: checkStoreLoop[i].TransactionDate,
-                  },
-                  $inc: {
-                    volume: checkStoreLoop[i].Volumn,
-                    value: checkStoreLoop[i].value_,
-                  },
+          if (getDailyMatch.length == 0) {
+            const dailyTransactionPayload: IDailySummary = {
+              collectionType: collection_id,
+              source_bank: Number(checkStoreLoop[i].SourceBank),
+              destination_bank: Number(checkStoreLoop[i].DestinationBank),
+              transactionDate: checkStoreLoop[i].TransactionDate,
+              day: String(checkStoreLoop[i].TransactionDate?.getDate()),
+              month: String(checkStoreLoop[i].TransactionDate?.getMonth() + 1),
+              year: String(checkStoreLoop[i].TransactionDate?.getFullYear()),
+              value: checkStoreLoop[i].value_,
+              volume: checkStoreLoop[i].Volumn,
+            };
+            await DailySummary.create(dailyTransactionPayload);
+          } else if (getDailyMatch.length == 1) {
+            await DailySummary.findOneAndUpdate(
+              { _id: getDailyMatch[0]._id },
+              {
+                $set: {
+                  source_bank: checkStoreLoop[i].SourceBank,
+                  destination_bank: getDailyMatch[0].destination_bank,
+                  collectionType: getDailyMatch[0].collectionType,
+                  day: getDailyMatch[0].day,
+                  month: getDailyMatch[0].month,
+                  year: getDailyMatch[0].year,
+                  transactionDate: checkStoreLoop[i].TransactionDate,
                 },
-                {
-                  new: true,
-                  upsert: true,
-                }
-              );
-            }
-
-            // Monthly Aggregate
-            let getMonthlyMatch = await MonthlySummary.find({
-              $and: [
-                { month: checkStoreLoop[i].TransactionDate?.getMonth() + 1 },
-                { year: checkStoreLoop[i].TransactionDate?.getFullYear() },
-                { collectionType: collection_id },
-                { destination_bank: checkStoreLoop[i].DestinationBank },
-              ],
-            });
-
-            if (getMonthlyMatch.length == 0) {
-              const monthlyTransactionPayload: IMonthlySummary = {
-                collectionType: collection_id,
-                source_bank: Number(checkStoreLoop[i].SourceBank),
-                destination_bank: Number(checkStoreLoop[i].DestinationBank),
-                transactionDate: checkStoreLoop[i].TransactionDate,
-                month: String(checkStoreLoop[i].TransactionDate?.getMonth() + 1),
-                year: String(checkStoreLoop[i].TransactionDate?.getFullYear()),
-                value: checkStoreLoop[i].value_,
-                volume: checkStoreLoop[i].Volumn,
-              };
-              await MonthlySummary.create(monthlyTransactionPayload);
-            } else if (getMonthlyMatch.length == 1) {
-              await MonthlySummary.findOneAndUpdate(
-                { _id: getMonthlyMatch[0]._id },
-                {
-                  $set: {
-                    source_bank: checkStoreLoop[i].SourceBank,
-                    destination_bank: getMonthlyMatch[0].destination_bank,
-                    collectionType: getMonthlyMatch[0].collectionType,
-                    month: getMonthlyMatch[0].month,
-                    year: getMonthlyMatch[0].year,
-                    transactionDate: checkStoreLoop[i].TransactionDate,
-                  },
-                  $inc: {
-                    volume: checkStoreLoop[i].Volumn,
-                    value: checkStoreLoop[i].value_,
-                  },
+                $inc: {
+                  volume: checkStoreLoop[i].Volumn,
+                  value: checkStoreLoop[i].value_,
                 },
-                {
-                  new: true,
-                  upsert: true,
-                }
-              );
-            }
+              },
+              {
+                new: true,
+                upsert: true,
+              }
+            );
+          }
 
-            // Yearly Aggregate
-            let getYearlyMatch = await YearlySummary.find({
-              $and: [
-                { year: checkStoreLoop[i].TransactionDate?.getFullYear() },
-                { collectionType: collection_id },
-                { destination_bank: checkStoreLoop[i].DestinationBank },
-              ],
-            });
+          // Monthly Aggregate
+          let getMonthlyMatch = await MonthlySummary.find({
+            $and: [
+              { month: checkStoreLoop[i].TransactionDate?.getMonth() + 1 },
+              { year: checkStoreLoop[i].TransactionDate?.getFullYear() },
+              { collectionType: collection_id },
+              { destination_bank: checkStoreLoop[i].DestinationBank },
+            ],
+          });
 
-            if (getYearlyMatch.length == 0) {
-              const yearlyTransactionPayload: IYearlySummary = {
-                collectionType: collection_id,
-                source_bank: Number(checkStoreLoop[i].SourceBank),
-                destination_bank: Number(checkStoreLoop[i].DestinationBank),
-                transactionDate: checkStoreLoop[i].TransactionDate,
-                year: String(checkStoreLoop[i].TransactionDate?.getFullYear()),
-                value: checkStoreLoop[i].value_,
-                volume: checkStoreLoop[i].Volumn,
-              };
-              await YearlySummary.create(yearlyTransactionPayload);
-            } else if (getYearlyMatch.length == 1) {
-              await YearlySummary.findOneAndUpdate(
-                { _id: getYearlyMatch[0]._id },
-                {
-                  $set: {
-                    source_bank: checkStoreLoop[i].SourceBank,
-                    destination_bank: getYearlyMatch[0].destination_bank,
-                    collectionType: getYearlyMatch[0].collectionType,
-                    year: getYearlyMatch[0].year,
-                    transactionDate: checkStoreLoop[i].TransactionDate,
-                  },
-                  $inc: {
-                    volume: checkStoreLoop[i].Volumn,
-                    value: checkStoreLoop[i].value_,
-                  },
+          if (getMonthlyMatch.length == 0) {
+            const monthlyTransactionPayload: IMonthlySummary = {
+              collectionType: collection_id,
+              source_bank: Number(checkStoreLoop[i].SourceBank),
+              destination_bank: Number(checkStoreLoop[i].DestinationBank),
+              transactionDate: checkStoreLoop[i].TransactionDate,
+              month: String(checkStoreLoop[i].TransactionDate?.getMonth() + 1),
+              year: String(checkStoreLoop[i].TransactionDate?.getFullYear()),
+              value: checkStoreLoop[i].value_,
+              volume: checkStoreLoop[i].Volumn,
+            };
+            await MonthlySummary.create(monthlyTransactionPayload);
+          } else if (getMonthlyMatch.length == 1) {
+            await MonthlySummary.findOneAndUpdate(
+              { _id: getMonthlyMatch[0]._id },
+              {
+                $set: {
+                  source_bank: checkStoreLoop[i].SourceBank,
+                  destination_bank: getMonthlyMatch[0].destination_bank,
+                  collectionType: getMonthlyMatch[0].collectionType,
+                  month: getMonthlyMatch[0].month,
+                  year: getMonthlyMatch[0].year,
+                  transactionDate: checkStoreLoop[i].TransactionDate,
                 },
-                {
-                  new: true,
-                  upsert: true,
-                }
-              );
-            }
+                $inc: {
+                  volume: checkStoreLoop[i].Volumn,
+                  value: checkStoreLoop[i].value_,
+                },
+              },
+              {
+                new: true,
+                upsert: true,
+              }
+            );
+          }
 
-            if (checkStoreLoop.length - 1 === i) {
-              console.log('POS SUMMARY SEEDED');
+          // Yearly Aggregate
+          let getYearlyMatch = await YearlySummary.find({
+            $and: [
+              { year: checkStoreLoop[i].TransactionDate?.getFullYear() },
+              { collectionType: collection_id },
+              { destination_bank: checkStoreLoop[i].DestinationBank },
+            ],
+          });
 
-              // Update count
-              await DocCount.findByIdAndUpdate(
-                { _id: getCount._id },
-                { count: checkTransaction.length }
-              );
-            }
+          if (getYearlyMatch.length == 0) {
+            const yearlyTransactionPayload: IYearlySummary = {
+              collectionType: collection_id,
+              source_bank: Number(checkStoreLoop[i].SourceBank),
+              destination_bank: Number(checkStoreLoop[i].DestinationBank),
+              transactionDate: checkStoreLoop[i].TransactionDate,
+              year: String(checkStoreLoop[i].TransactionDate?.getFullYear()),
+              value: checkStoreLoop[i].value_,
+              volume: checkStoreLoop[i].Volumn,
+            };
+            await YearlySummary.create(yearlyTransactionPayload);
+          } else if (getYearlyMatch.length == 1) {
+            await YearlySummary.findOneAndUpdate(
+              { _id: getYearlyMatch[0]._id },
+              {
+                $set: {
+                  source_bank: checkStoreLoop[i].SourceBank,
+                  destination_bank: getYearlyMatch[0].destination_bank,
+                  collectionType: getYearlyMatch[0].collectionType,
+                  year: getYearlyMatch[0].year,
+                  transactionDate: checkStoreLoop[i].TransactionDate,
+                },
+                $inc: {
+                  volume: checkStoreLoop[i].Volumn,
+                  value: checkStoreLoop[i].value_,
+                },
+              },
+              {
+                new: true,
+                upsert: true,
+              }
+            );
           }
         }
       }
@@ -410,186 +395,170 @@ class TransactionController {
     try {
       const transactionNipRepository = getRepository(nfs_nip_trans, 'NIPDB');
 
-      // Check count of documents in CBN MYSQL Database
-      let checkTransaction = await transactionNipRepository.find();
+      let checkStoreLoop: any = await transactionNipRepository.find();
 
-      // Get previous count data from MONGO Database
-      let getCount: any = await DocCount.findOne({
-        category: ICountCategory.NIP_TRANSACTION,
-      });
+      for (let i = 0; i < checkStoreLoop.length; i++) {
+        let getCollectionType = await CollectionType.findOne({
+          old_id: checkStoreLoop[i].CollectionType,
+        });
+        let collection_id = getCollectionType ? getCollectionType._id : null;
 
-      // Check if count document exist
-      if (!getCount) {
-        const countPayload: IDocCount = {
-          count: 0,
-          category: ICountCategory.NIP_TRANSACTION,
-        };
-        await DocCount.create(countPayload);
-        console.log('COUNT CREATED');
-      }
+        const trans_id = await Transactions.findOne({ trans_id: checkStoreLoop[i].id });
 
-      if (getCount) {
-        // Compare last count to current document count
-        if (getCount.count < checkTransaction.length) {
-          // Get data based on the time created
-          // If the time created is higher than the count doc, we proceed
+        if (!trans_id) {
+          // Save Transaction
 
-          let checkStoreLoop: any = await transactionNipRepository.find({
-            TransactionDate: MoreThan(getCount.updatedAt),
+          const transactionPayload = {
+            trans_id: checkStoreLoop[i].id,
+            collectionType: collection_id,
+            source_bank: Number(checkStoreLoop[i].SourceBank),
+            category: 'NIP',
+            success: collection_id == '60' ? true : false,
+            type: 'DMB',
+            destination_bank: Number(checkStoreLoop[i].DestinationBank),
+            transactionDate: checkStoreLoop[i].TransactionDate,
+            value: checkStoreLoop[i].value_,
+            volume: checkStoreLoop[i].Volumn,
+          };
+
+          await Transactions.create(transactionPayload);
+
+          // Daily Aggregate
+          let getDailyMatch = await DailySummary.find({
+            $and: [
+              { day: checkStoreLoop[i].TransactionDate?.getDate() },
+              { month: checkStoreLoop[i].TransactionDate?.getMonth() + 1 },
+              { year: checkStoreLoop[i].TransactionDate?.getFullYear() },
+              { collectionType: collection_id },
+              { destination_bank: checkStoreLoop[i].DestinationBank },
+            ],
           });
-          for (let i = 0; i < checkStoreLoop.length; i++) {
-            let getCollectionType = await CollectionType.findOne({
-              old_id: checkStoreLoop[i].CollectionType,
-            });
-            let collection_id = getCollectionType ? getCollectionType._id : null;
 
-            // Daily Aggregate
-            let getDailyMatch = await DailySummary.find({
-              $and: [
-                { day: checkStoreLoop[i].TransactionDate?.getDate() },
-                { month: checkStoreLoop[i].TransactionDate?.getMonth() + 1 },
-                { year: checkStoreLoop[i].TransactionDate?.getFullYear() },
-                { collectionType: collection_id },
-                { destination_bank: checkStoreLoop[i].DestinationBank },
-              ],
-            });
-
-            if (getDailyMatch.length == 0) {
-              const dailyTransactionPayload: IDailySummary = {
-                collectionType: collection_id,
-                source_bank: Number(checkStoreLoop[i].SourceBank),
-                destination_bank: Number(checkStoreLoop[i].DestinationBank),
-                transactionDate: checkStoreLoop[i].TransactionDate,
-                day: String(checkStoreLoop[i].TransactionDate?.getDate()),
-                month: String(checkStoreLoop[i].TransactionDate?.getMonth() + 1),
-                year: String(checkStoreLoop[i].TransactionDate?.getFullYear()),
-                value: checkStoreLoop[i].value_,
-                volume: checkStoreLoop[i].Volumn,
-              };
-              await DailySummary.create(dailyTransactionPayload);
-            } else if (getDailyMatch.length == 1) {
-              await DailySummary.findOneAndUpdate(
-                { _id: getDailyMatch[0]._id },
-                {
-                  $set: {
-                    source_bank: checkStoreLoop[i].SourceBank,
-                    destination_bank: getDailyMatch[0].destination_bank,
-                    collectionType: getDailyMatch[0].collectionType,
-                    day: getDailyMatch[0].day,
-                    month: getDailyMatch[0].month,
-                    year: getDailyMatch[0].year,
-                    transactionDate: checkStoreLoop[i].TransactionDate,
-                  },
-                  $inc: {
-                    volume: checkStoreLoop[i].Volumn,
-                    value: checkStoreLoop[i].value_,
-                  },
+          if (getDailyMatch.length == 0) {
+            const dailyTransactionPayload: IDailySummary = {
+              collectionType: collection_id,
+              source_bank: Number(checkStoreLoop[i].SourceBank),
+              destination_bank: Number(checkStoreLoop[i].DestinationBank),
+              transactionDate: checkStoreLoop[i].TransactionDate,
+              day: String(checkStoreLoop[i].TransactionDate?.getDate()),
+              month: String(checkStoreLoop[i].TransactionDate?.getMonth() + 1),
+              year: String(checkStoreLoop[i].TransactionDate?.getFullYear()),
+              value: checkStoreLoop[i].value_,
+              volume: checkStoreLoop[i].Volumn,
+            };
+            await DailySummary.create(dailyTransactionPayload);
+          } else if (getDailyMatch.length == 1) {
+            await DailySummary.findOneAndUpdate(
+              { _id: getDailyMatch[0]._id },
+              {
+                $set: {
+                  source_bank: checkStoreLoop[i].SourceBank,
+                  destination_bank: getDailyMatch[0].destination_bank,
+                  collectionType: getDailyMatch[0].collectionType,
+                  day: getDailyMatch[0].day,
+                  month: getDailyMatch[0].month,
+                  year: getDailyMatch[0].year,
+                  transactionDate: checkStoreLoop[i].TransactionDate,
                 },
-                {
-                  new: true,
-                  upsert: true,
-                }
-              );
-            }
-
-            // Monthly Aggregate
-            let getMonthlyMatch = await MonthlySummary.find({
-              $and: [
-                { month: checkStoreLoop[i].TransactionDate?.getMonth() + 1 },
-                { year: checkStoreLoop[i].TransactionDate?.getFullYear() },
-                { collectionType: collection_id },
-                { destination_bank: checkStoreLoop[i].DestinationBank },
-              ],
-            });
-
-            if (getMonthlyMatch.length == 0) {
-              const monthlyTransactionPayload: IMonthlySummary = {
-                collectionType: collection_id,
-                source_bank: Number(checkStoreLoop[i].SourceBank),
-                destination_bank: Number(checkStoreLoop[i].DestinationBank),
-                transactionDate: checkStoreLoop[i].TransactionDate,
-                month: String(checkStoreLoop[i].TransactionDate?.getMonth() + 1),
-                year: String(checkStoreLoop[i].TransactionDate?.getFullYear()),
-                value: checkStoreLoop[i].value_,
-                volume: checkStoreLoop[i].Volumn,
-              };
-              await MonthlySummary.create(monthlyTransactionPayload);
-            } else if (getMonthlyMatch.length == 1) {
-              await MonthlySummary.findOneAndUpdate(
-                { _id: getMonthlyMatch[0]._id },
-                {
-                  $set: {
-                    source_bank: checkStoreLoop[i].SourceBank,
-                    destination_bank: getMonthlyMatch[0].destination_bank,
-                    collectionType: getMonthlyMatch[0].collectionType,
-                    month: getMonthlyMatch[0].month,
-                    year: getMonthlyMatch[0].year,
-                    transactionDate: checkStoreLoop[i].TransactionDate,
-                  },
-                  $inc: {
-                    volume: checkStoreLoop[i].Volumn,
-                    value: checkStoreLoop[i].value_,
-                  },
+                $inc: {
+                  volume: checkStoreLoop[i].Volumn,
+                  value: checkStoreLoop[i].value_,
                 },
-                {
-                  new: true,
-                  upsert: true,
-                }
-              );
-            }
+              },
+              {
+                new: true,
+                upsert: true,
+              }
+            );
+          }
 
-            // Yearly Aggregate
-            let getYearlyMatch = await YearlySummary.find({
-              $and: [
-                { year: checkStoreLoop[i].TransactionDate?.getFullYear() },
-                { collectionType: collection_id },
-                { destination_bank: checkStoreLoop[i].DestinationBank },
-              ],
-            });
+          // Monthly Aggregate
+          let getMonthlyMatch = await MonthlySummary.find({
+            $and: [
+              { month: checkStoreLoop[i].TransactionDate?.getMonth() + 1 },
+              { year: checkStoreLoop[i].TransactionDate?.getFullYear() },
+              { collectionType: collection_id },
+              { destination_bank: checkStoreLoop[i].DestinationBank },
+            ],
+          });
 
-            if (getYearlyMatch.length == 0) {
-              const yearlyTransactionPayload: IYearlySummary = {
-                collectionType: collection_id,
-                source_bank: Number(checkStoreLoop[i].SourceBank),
-                destination_bank: Number(checkStoreLoop[i].DestinationBank),
-                transactionDate: checkStoreLoop[i].TransactionDate,
-                year: String(checkStoreLoop[i].TransactionDate?.getFullYear()),
-                value: checkStoreLoop[i].value_,
-                volume: checkStoreLoop[i].Volumn,
-              };
-              await YearlySummary.create(yearlyTransactionPayload);
-            } else if (getYearlyMatch.length == 1) {
-              await YearlySummary.findOneAndUpdate(
-                { _id: getYearlyMatch[0]._id },
-                {
-                  $set: {
-                    source_bank: checkStoreLoop[i].SourceBank,
-                    destination_bank: getYearlyMatch[0].destination_bank,
-                    collectionType: getYearlyMatch[0].collectionType,
-                    year: getYearlyMatch[0].year,
-                    transactionDate: checkStoreLoop[i].TransactionDate,
-                  },
-                  $inc: {
-                    volume: checkStoreLoop[i].Volumn,
-                    value: checkStoreLoop[i].value_,
-                  },
+          if (getMonthlyMatch.length == 0) {
+            const monthlyTransactionPayload: IMonthlySummary = {
+              collectionType: collection_id,
+              source_bank: Number(checkStoreLoop[i].SourceBank),
+              destination_bank: Number(checkStoreLoop[i].DestinationBank),
+              transactionDate: checkStoreLoop[i].TransactionDate,
+              month: String(checkStoreLoop[i].TransactionDate?.getMonth() + 1),
+              year: String(checkStoreLoop[i].TransactionDate?.getFullYear()),
+              value: checkStoreLoop[i].value_,
+              volume: checkStoreLoop[i].Volumn,
+            };
+            await MonthlySummary.create(monthlyTransactionPayload);
+          } else if (getMonthlyMatch.length == 1) {
+            await MonthlySummary.findOneAndUpdate(
+              { _id: getMonthlyMatch[0]._id },
+              {
+                $set: {
+                  source_bank: checkStoreLoop[i].SourceBank,
+                  destination_bank: getMonthlyMatch[0].destination_bank,
+                  collectionType: getMonthlyMatch[0].collectionType,
+                  month: getMonthlyMatch[0].month,
+                  year: getMonthlyMatch[0].year,
+                  transactionDate: checkStoreLoop[i].TransactionDate,
                 },
-                {
-                  new: true,
-                  upsert: true,
-                }
-              );
-            }
+                $inc: {
+                  volume: checkStoreLoop[i].Volumn,
+                  value: checkStoreLoop[i].value_,
+                },
+              },
+              {
+                new: true,
+                upsert: true,
+              }
+            );
+          }
 
-            if (checkStoreLoop.length - 1 === i) {
-              console.log('NIP SUMMARY SEEDED');
+          // Yearly Aggregate
+          let getYearlyMatch = await YearlySummary.find({
+            $and: [
+              { year: checkStoreLoop[i].TransactionDate?.getFullYear() },
+              { collectionType: collection_id },
+              { destination_bank: checkStoreLoop[i].DestinationBank },
+            ],
+          });
 
-              // Update count
-              await DocCount.findByIdAndUpdate(
-                { _id: getCount._id },
-                { count: checkTransaction.length }
-              );
-            }
+          if (getYearlyMatch.length == 0) {
+            const yearlyTransactionPayload: IYearlySummary = {
+              collectionType: collection_id,
+              source_bank: Number(checkStoreLoop[i].SourceBank),
+              destination_bank: Number(checkStoreLoop[i].DestinationBank),
+              transactionDate: checkStoreLoop[i].TransactionDate,
+              year: String(checkStoreLoop[i].TransactionDate?.getFullYear()),
+              value: checkStoreLoop[i].value_,
+              volume: checkStoreLoop[i].Volumn,
+            };
+            await YearlySummary.create(yearlyTransactionPayload);
+          } else if (getYearlyMatch.length == 1) {
+            await YearlySummary.findOneAndUpdate(
+              { _id: getYearlyMatch[0]._id },
+              {
+                $set: {
+                  source_bank: checkStoreLoop[i].SourceBank,
+                  destination_bank: getYearlyMatch[0].destination_bank,
+                  collectionType: getYearlyMatch[0].collectionType,
+                  year: getYearlyMatch[0].year,
+                  transactionDate: checkStoreLoop[i].TransactionDate,
+                },
+                $inc: {
+                  volume: checkStoreLoop[i].Volumn,
+                  value: checkStoreLoop[i].value_,
+                },
+              },
+              {
+                new: true,
+                upsert: true,
+              }
+            );
           }
         }
       }

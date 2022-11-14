@@ -46,8 +46,6 @@ const seedCollection = () => {
         console.log(`${savedCollectionType.category} ${savedCollectionType.success} created.`);
       }
     });
-
-    console.log('DONE');
   } catch (err: any | Error | unknown) {
     console.log(err.message);
   }

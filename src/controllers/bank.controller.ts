@@ -4,8 +4,6 @@ import { getRepository, getConnection } from 'typeorm';
 
 import Bank from '../models/bank.model';
 import { IBank } from '../interfaces/bank.interface';
-import DocCount from '../models/doc_count.model';
-import { IDocCount, ICountCategory } from '../interfaces/doc_count.interface';
 
 import nfs_pos_bank_list from '../Entities/nfs_pos_bank_list';
 import nfs_nip_bank_list from '../Entities/nfs_nip_bank_list';
@@ -122,51 +120,20 @@ class BankController {
       // Check count of documents in NIBSS MYSQL Database
       let checkBank = await bankRepository.find();
 
-      // Get previous count data from MONGO Database
-      let getCount: any = await DocCount.findOne({ category: ICountCategory.BANK_POS });
+      checkBank.forEach(async (e: any) => {
+        const checkBank = await Bank.findOne({ bank_code: e.id });
 
-      // If count is not null
-      if (getCount !== null) {
-        // If NIBSS data is more than the previous count, update
-
-        if (checkBank.length > getCount.count) {
-          checkBank.forEach(async (e: any) => {
-            let result = await Bank.updateMany(
-              { name: e.bankname },
-              {
-                $setOnInsert: {
-                  name: e.bankname,
-                  bank_code: e.id,
-                  bank_category: 'DMB',
-                },
-              },
-              { upsert: true }
-            );
-
-            if (result.upsertedCount > 0) {
-              await DocCount.findByIdAndUpdate({ _id: getCount._id }, { count: checkBank.length });
-            }
-          });
-          console.log('BANK UPDATED');
-        }
-      } else {
-        checkBank.forEach(async (e: any) => {
+        if (!checkBank) {
           const bankPayload: IBank = {
             name: e.bankname,
             bank_code: e.id,
             bank_category: 'DMB',
           };
           await Bank.create(bankPayload);
-        });
+        }
+      });
 
-        const countPayload: IDocCount = {
-          count: checkBank.length,
-          category: ICountCategory.BANK_POS,
-        };
-        await DocCount.create(countPayload);
-
-        console.log('POS BANK CREATED');
-      }
+      console.log('POS BANK CREATED');
     } catch (err: any) {
       console.log(err.message);
     }
@@ -175,56 +142,21 @@ class BankController {
   public static bankListPipelineNip = async () => {
     try {
       const bankRepository = getRepository(nfs_nip_bank_list, 'NIPDB');
-
-      // Check count of documents in NIBSS MYSQL Database
       let checkBank = await bankRepository.find();
+      checkBank.forEach(async (e: any) => {
+        const checkBank = await Bank.findOne({ bank_code: e.id });
 
-      // Get previous count data from MONGO Database
-      let getCount: any = await DocCount.findOne({ category: ICountCategory.BANK_NIP });
-
-      // If count is not null
-      if (getCount !== null) {
-        // If NIBSS data is more than the previous count, update
-
-        if (checkBank.length > getCount.count) {
-          checkBank.forEach(async (e: any) => {
-            let result = await Bank.updateMany(
-              { name: e.bankname },
-              {
-                $setOnInsert: {
-                  name: e.bankname,
-                  bank_code: e.id,
-                  bank_category: 'DMB',
-                },
-              },
-              { upsert: true }
-            );
-
-            if (result.upsertedCount > 0) {
-              await DocCount.findByIdAndUpdate({ _id: getCount._id }, { count: checkBank.length });
-            }
-          });
-          console.log('NIP BANK UPDATED');
-        }
-        console.log('Banks');
-      } else {
-        checkBank.forEach(async (e: any) => {
+        if (!checkBank) {
           const bankPayload: IBank = {
             name: e.bankname,
             bank_code: e.id,
             bank_category: 'DMB',
           };
           await Bank.create(bankPayload);
-        });
+        }
+      });
 
-        const countPayload: IDocCount = {
-          count: checkBank.length,
-          category: ICountCategory.BANK_NIP,
-        };
-        await DocCount.create(countPayload);
-
-        console.log('NIP BANK CREATED');
-      }
+      console.log('NIP BANK CREATED');
     } catch (err: any) {
       console.log(err.message);
     }

@@ -3,6 +3,9 @@ import { ITransactionsDocument } from '../interfaces/transactions.interface';
 
 const transactionSchema = new Schema(
   {
+    trans_id: {
+      type: Number,
+    },
     source_bank: {
       type: Number,
     },
