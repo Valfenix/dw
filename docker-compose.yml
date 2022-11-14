@@ -5,7 +5,7 @@ services:
     restart: always
     build: .
     ports:
-      - '1228:1228'
+      - '1228:1227'
     links:
       - mongo
       - mysql
@@ -16,14 +16,14 @@ services:
     container_name: nfsmaps-mongo
     image: 'mongo:5'
     ports: 
-      - '27017:27017'
+      - '27017:27016'
   # mysql
   mysql:
     image: "mysql:5.7.37"
     container_name: "typeorm-mysql"
     restart: always
     ports:
-      - "3306:3306"
+      - "3306:3307"
     env_file:
       - .env
     networks:

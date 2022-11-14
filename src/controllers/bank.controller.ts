@@ -6,7 +6,7 @@ import Bank from '../models/bank.model';
 import { IBank } from '../interfaces/bank.interface';
 import DocCount from '../models/doc_count.model';
 import { IDocCount, ICountCategory } from '../interfaces/doc_count.interface';
-import cron from 'node-cron';
+
 import nfs_pos_bank_list from '../Entities/nfs_pos_bank_list';
 import nfs_nip_bank_list from '../Entities/nfs_nip_bank_list';
 
@@ -206,6 +206,7 @@ class BankController {
           });
           console.log('NIP BANK UPDATED');
         }
+        console.log('Banks');
       } else {
         checkBank.forEach(async (e: any) => {
           const bankPayload: IBank = {
@@ -231,9 +232,3 @@ class BankController {
 }
 
 export default BankController;
-
-// Bank Cron Job
-cron.schedule(String(process.env.NIBSS_CRON), async () => {
-  BankController.bankListPipelinePos();
-  BankController.bankListPipelineNip();
-});

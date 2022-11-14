@@ -1,4 +1,5 @@
 FROM node:12.17.0-alpine
+# FROM node:alpine
 WORKDIR /var/www/nfsdatawarehouse
 COPY package.json ./
 COPY tsconfig.json ./
@@ -10,6 +11,7 @@ RUN npm run tsc
 FROM node:12.17.0-alpine
 WORKDIR /var/www/nfsdatawarehouse
 COPY package.json ./
+RUN npm cache clean --force
 RUN npm install
 COPY --from=0 /var/www/nfsdatawarehouse/build .
 RUN npm install pm2 -g

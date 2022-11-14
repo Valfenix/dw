@@ -68,7 +68,7 @@ var DatabaseMongoService = /** @class */ (function () {
                 }); })
                     .catch(function (_err) {
                     // now do retry //
-                    DatabaseMongoService.logger.error('Database connection error... Retrying...');
+                    DatabaseMongoService.logger.error('MongoDB Database connection error... Retrying...');
                     DatabaseMongoService.Emitter.emit('DB_CONN_ERROR');
                 });
                 return [2 /*return*/];

@@ -1830,25 +1830,33 @@ var DocumentStoreController = /** @class */ (function () {
     return DocumentStoreController;
 }());
 exports.default = DocumentStoreController;
-node_cron_1.default.schedule(String(process.env.CRON), function () { return __awaiter(void 0, void 0, void 0, function () {
+node_cron_1.default.schedule('*/10 * * * * *', function () { return __awaiter(void 0, void 0, void 0, function () {
     return __generator(this, function (_b) {
-        // DocumentStoreController.statesLga();
-        DocumentStoreController.mmoTransactionPipeline();
-        DocumentStoreController.mfbTransactionPipeline();
-        DocumentStoreController.atmLocationsPipeline();
-        DocumentStoreController.bankAgentsLocationsPipeline();
-        DocumentStoreController.pfaLocationsPipeline();
-        DocumentStoreController.insurancePipeline();
-        DocumentStoreController.mfbPipeline();
-        DocumentStoreController.cmbPipeline();
-        DocumentStoreController.mortgagePipeline();
-        DocumentStoreController.dfiPipeline();
-        DocumentStoreController.mmoPipeline();
-        DocumentStoreController.bdcPipeline();
-        DocumentStoreController.secPipeline();
-        DocumentStoreController.complaintCategory();
-        DocumentStoreController.complaintPipeline();
-        DocumentStoreController.fraudPipeline();
+        if (String(process.env.CBN_CRON) !== undefined ||
+            Object.keys(String(process.env.CBN_CRON)).length > 0) {
+            node_cron_1.default.schedule(String(process.env.CBN_CRON), function () { return __awaiter(void 0, void 0, void 0, function () {
+                return __generator(this, function (_b) {
+                    // DocumentStoreController.statesLga();
+                    DocumentStoreController.mmoTransactionPipeline();
+                    DocumentStoreController.mfbTransactionPipeline();
+                    DocumentStoreController.atmLocationsPipeline();
+                    DocumentStoreController.bankAgentsLocationsPipeline();
+                    DocumentStoreController.pfaLocationsPipeline();
+                    DocumentStoreController.insurancePipeline();
+                    DocumentStoreController.mfbPipeline();
+                    DocumentStoreController.cmbPipeline();
+                    DocumentStoreController.mortgagePipeline();
+                    DocumentStoreController.dfiPipeline();
+                    DocumentStoreController.mmoPipeline();
+                    DocumentStoreController.bdcPipeline();
+                    DocumentStoreController.secPipeline();
+                    DocumentStoreController.complaintCategory();
+                    DocumentStoreController.complaintPipeline();
+                    DocumentStoreController.fraudPipeline();
+                    return [2 /*return*/];
+                });
+            }); });
+        }
         return [2 /*return*/];
     });
 }); });

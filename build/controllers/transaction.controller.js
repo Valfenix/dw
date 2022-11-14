@@ -661,7 +661,7 @@ var TransactionController = /** @class */ (function () {
 }());
 exports.default = TransactionController;
 // Collection Type Cron Job
-node_cron_1.default.schedule(String(process.env.CRON), function () { return __awaiter(void 0, void 0, void 0, function () {
+node_cron_1.default.schedule(String(process.env.NIBSS_CRON), function () { return __awaiter(void 0, void 0, void 0, function () {
     return __generator(this, function (_b) {
         TransactionController.posTransactionPipeline();
         TransactionController.nipTransactionPipeline();

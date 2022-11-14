@@ -5,6 +5,7 @@ dotenv.config();
 
 import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
+import cron from 'node-cron';
 import config from './config/config';
 
 import routes from './routes/index.routes';
@@ -14,6 +15,9 @@ import Logger from './lib/logger';
 import { PostGresDatabaseService } from './services/PostGresDBConnection';
 import { DatabaseService } from './services/MysqlDBConnection';
 import DatabaseMongoService from './services/MongoDBConnection';
+import BankController from './controllers/bank.controller';
+import DocumentStoreController from './controllers/data_store.controller';
+import TransactionController from './controllers/transaction.controller';
 
 declare global {
   namespace Express {
@@ -44,6 +48,46 @@ DatabaseService.getConnection();
 PostGresDatabaseService.getConnection();
 
 DatabaseMongoService.MongooseService();
+
+// Bank Cron Job
+cron.schedule(String(process.env.NIBSS_CRON), async () => {
+  BankController.bankListPipelinePos();
+  BankController.bankListPipelineNip();
+});
+
+// Transactions Cron
+cron.schedule(String(process.env.NIBSS_CRON), async () => {
+  TransactionController.posTransactionPipeline();
+  TransactionController.nipTransactionPipeline();
+});
+
+// CBN Cron Job
+cron.schedule('*/10 * * * * *', async () => {
+  if (
+    String(process.env.CBN_CRON) !== undefined ||
+    Object.keys(String(process.env.CBN_CRON)).length > 0
+  ) {
+    cron.schedule(String(process.env.CBN_CRON), async () => {
+      // DocumentStoreController.statesLga();
+      DocumentStoreController.mmoTransactionPipeline();
+      DocumentStoreController.mfbTransactionPipeline();
+      DocumentStoreController.atmLocationsPipeline();
+      DocumentStoreController.bankAgentsLocationsPipeline();
+      DocumentStoreController.pfaLocationsPipeline();
+      DocumentStoreController.insurancePipeline();
+      DocumentStoreController.mfbPipeline();
+      DocumentStoreController.cmbPipeline();
+      DocumentStoreController.mortgagePipeline();
+      DocumentStoreController.dfiPipeline();
+      DocumentStoreController.mmoPipeline();
+      DocumentStoreController.bdcPipeline();
+      DocumentStoreController.secPipeline();
+      DocumentStoreController.complaintCategory();
+      DocumentStoreController.complaintPipeline();
+      DocumentStoreController.fraudPipeline();
+    });
+  }
+});
 
 /** Log the request */
 router.use((req: Request, res: Response, next: NextFunction) => {

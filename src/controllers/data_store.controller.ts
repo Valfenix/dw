@@ -1456,30 +1456,3 @@ class DocumentStoreController {
 }
 
 export default DocumentStoreController;
-
-cron.schedule('*/10 * * * * *', async () => {
-  if (
-    String(process.env.CBN_CRON) !== undefined ||
-    Object.keys(String(process.env.CBN_CRON)).length > 0
-  ) {
-    cron.schedule(String(process.env.CBN_CRON), async () => {
-      // DocumentStoreController.statesLga();
-      DocumentStoreController.mmoTransactionPipeline();
-      DocumentStoreController.mfbTransactionPipeline();
-      DocumentStoreController.atmLocationsPipeline();
-      DocumentStoreController.bankAgentsLocationsPipeline();
-      DocumentStoreController.pfaLocationsPipeline();
-      DocumentStoreController.insurancePipeline();
-      DocumentStoreController.mfbPipeline();
-      DocumentStoreController.cmbPipeline();
-      DocumentStoreController.mortgagePipeline();
-      DocumentStoreController.dfiPipeline();
-      DocumentStoreController.mmoPipeline();
-      DocumentStoreController.bdcPipeline();
-      DocumentStoreController.secPipeline();
-      DocumentStoreController.complaintCategory();
-      DocumentStoreController.complaintPipeline();
-      DocumentStoreController.fraudPipeline();
-    });
-  }
-});

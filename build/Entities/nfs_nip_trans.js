@@ -15,6 +15,10 @@ var nfs_nip_trans = /** @class */ (function () {
     function nfs_nip_trans() {
     }
     __decorate([
+        (0, typeorm_1.PrimaryGeneratedColumn)(),
+        __metadata("design:type", Number)
+    ], nfs_nip_trans.prototype, "id", void 0);
+    __decorate([
         (0, typeorm_1.Column)({ default: null }),
         __metadata("design:type", Date)
     ], nfs_nip_trans.prototype, "TransactionDate", void 0);
@@ -38,16 +42,6 @@ var nfs_nip_trans = /** @class */ (function () {
         (0, typeorm_1.Column)('decimal', { precision: 18, scale: 2 }),
         __metadata("design:type", Number)
     ], nfs_nip_trans.prototype, "value_", void 0);
-    __decorate([
-        (0, typeorm_1.Column)(),
-        (0, typeorm_1.CreateDateColumn)(),
-        __metadata("design:type", Date)
-    ], nfs_nip_trans.prototype, "createdAt", void 0);
-    __decorate([
-        (0, typeorm_1.Column)(),
-        (0, typeorm_1.UpdateDateColumn)(),
-        __metadata("design:type", Date)
-    ], nfs_nip_trans.prototype, "updatedAt", void 0);
     nfs_nip_trans = __decorate([
         (0, typeorm_1.Entity)('nfs_nip_trans')
     ], nfs_nip_trans);

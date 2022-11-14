@@ -39,50 +39,45 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.DatabaseService = void 0;
+exports.PostGresDatabaseService = void 0;
 var typeorm_1 = require("typeorm");
 var events_1 = require("events");
-var nfs_pos_bank_list_1 = __importDefault(require("../Entities/nfs_pos_bank_list"));
-var nfs_nip_bank_list_1 = __importDefault(require("../Entities/nfs_nip_bank_list"));
-var nfs_pos_1 = __importDefault(require("../Entities/nfs_pos"));
-var nfs_nip_trans_1 = __importDefault(require("../Entities/nfs_nip_trans"));
-// import collection_type from '../Entities/collection_type';
+var document_store_1 = __importDefault(require("../Entities/document_store"));
 var logger_1 = __importDefault(require("../lib/logger"));
 var constants_1 = require("../config/constants");
-// import config from '../config/config';
-var DatabaseService = /** @class */ (function () {
-    function DatabaseService() {
+var PostGresDatabaseService = /** @class */ (function () {
+    function PostGresDatabaseService() {
     }
-    DatabaseService.getConnection = function () {
+    PostGresDatabaseService.getConnection = function () {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        DatabaseService.registerEvent();
-                        return [4 /*yield*/, DatabaseService.createConnection()];
+                        PostGresDatabaseService.registerEvent();
+                        return [4 /*yield*/, PostGresDatabaseService.createConnection()];
                     case 1: return [2 /*return*/, _a.sent()];
                 }
             });
         });
     };
-    DatabaseService.registerEvent = function () {
+    PostGresDatabaseService.registerEvent = function () {
         return __awaiter(this, void 0, void 0, function () {
             var _this = this;
             return __generator(this, function (_a) {
-                DatabaseService.Emitter.on('DB_CONN_ERROR', function () { return __awaiter(_this, void 0, void 0, function () {
+                PostGresDatabaseService.Emitter.on('DB_CONN_ERROR', function () { return __awaiter(_this, void 0, void 0, function () {
                     var _this = this;
                     return __generator(this, function (_a) {
-                        DatabaseService.logger.error('MYSQL Database connection error... Retrying...');
+                        PostGresDatabaseService.logger.error('POSTGRES Database connection error... Retrying...');
                         setTimeout(function () { return __awaiter(_this, void 0, void 0, function () {
                             return __generator(this, function (_a) {
                                 switch (_a.label) {
-                                    case 0: return [4 /*yield*/, DatabaseService.createConnection()];
+                                    case 0: return [4 /*yield*/, PostGresDatabaseService.createConnection()];
                                     case 1:
                                         _a.sent();
                                         return [2 /*return*/];
                                 }
                             });
-                        }); }, 10000);
+                        }); }, 300000);
                         return [2 /*return*/];
                     });
                 }); });
@@ -90,62 +85,41 @@ var DatabaseService = /** @class */ (function () {
             });
         });
     };
-    DatabaseService.createConnection = function () {
+    PostGresDatabaseService.createConnection = function () {
         return __awaiter(this, void 0, void 0, function () {
-            var _a, _b, _c;
-            return __generator(this, function (_d) {
-                switch (_d.label) {
-                    case 0:
-                        _b = (_a = Promise).all;
-                        return [4 /*yield*/, (0, typeorm_1.createConnection)({
-                                name: 'UTILITYAPPDB',
-                                type: 'mysql',
-                                host: String(process.env.MYSQL_DB_HOST1),
-                                username: String(process.env.MYSQL_DB_USERNAME1),
-                                password: String(process.env.MYSQL_DB_PASSWORD1),
-                                port: Number(process.env.MYSQL_DB_PORT1),
-                                database: String(process.env.MYSQL_DB_DATABASE1),
-                                synchronize: false,
-                                logging: false,
-                                entities: [nfs_pos_bank_list_1.default, nfs_pos_1.default],
-                            })];
-                    case 1:
-                        _c = [
-                            _d.sent()
-                        ];
-                        return [4 /*yield*/, (0, typeorm_1.createConnection)({
-                                name: 'NIPDB',
-                                type: 'mysql',
-                                host: String(process.env.MYSQL_DB_HOST2),
-                                username: String(process.env.MYSQL_DB_USERNAME2),
-                                password: String(process.env.MYSQL_DB_PASSWORD2),
-                                port: Number(process.env.MYSQL_DB_PORT2),
-                                database: String(process.env.MYSQL_DB_DATABASE2),
-                                synchronize: false,
-                                logging: false,
-                                entities: [nfs_nip_bank_list_1.default, nfs_nip_trans_1.default],
-                            })];
-                    case 2:
-                        _b.apply(_a, [_c.concat([
-                                _d.sent()
-                            ])])
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, (0, typeorm_1.createConnection)({
+                            name: 'POSTGRES',
+                            type: 'postgres',
+                            host: String(process.env.POSTGRES_DB_HOST),
+                            username: String(process.env.POSTGRES_DB_USERNAME),
+                            password: String(process.env.POSTGRES_DB_PASSWORD),
+                            port: Number(process.env.POSTGRES_DB_PORT),
+                            database: String(process.env.POSTGRES_DB_DATABASE),
+                            synchronize: false,
+                            logging: false,
+                            entities: [document_store_1.default],
+                        })
                             .then(function () {
-                            DatabaseService.logger.info('Connected to MYSQL UTILITY_APP_DB AND MYSQL NIP_DB');
+                            PostGresDatabaseService.logger.info('Connected to POSTGRES CBN');
                         })
                             .catch(function (_err) {
-                            console.log(_err);
+                            // console.log(_err);
                             // now do retry //
-                            DatabaseService.logger.error('MYSQL Database connection error... Retrying...');
-                            DatabaseService.Emitter.emit('DB_CONN_ERROR');
-                        });
+                            PostGresDatabaseService.logger.error('POSTGRES Database connection error... Retrying...');
+                            PostGresDatabaseService.Emitter.emit('DB_CONN_ERROR');
+                        })];
+                    case 1:
+                        _a.sent();
                         return [2 /*return*/];
                 }
             });
         });
     };
-    DatabaseService.Emitter = new events_1.EventEmitter();
-    DatabaseService.logger = new logger_1.default('db', constants_1.DATABASE_NAMESPACE);
-    return DatabaseService;
+    PostGresDatabaseService.Emitter = new events_1.EventEmitter();
+    PostGresDatabaseService.logger = new logger_1.default('db', constants_1.DATABASE_NAMESPACE);
+    return PostGresDatabaseService;
 }());
-exports.DatabaseService = DatabaseService;
-//# sourceMappingURL=MysqlDBConnection.js.map
+exports.PostGresDatabaseService = PostGresDatabaseService;
+//# sourceMappingURL=PostGresDBConnection.js.map

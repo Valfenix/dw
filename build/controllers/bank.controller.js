@@ -154,6 +154,8 @@ var BankController = /** @class */ (function () {
                                     case 0: return [4 /*yield*/, bank_model_1.default.updateMany({ name: e.bankname }, {
                                             $setOnInsert: {
                                                 name: e.bankname,
+                                                bank_code: e.id,
+                                                bank_category: 'DMB',
                                             },
                                         }, { upsert: true })];
                                     case 1:
@@ -178,8 +180,8 @@ var BankController = /** @class */ (function () {
                                 case 0:
                                     bankPayload = {
                                         name: e.bankname,
-                                        // bank_code: e.bank_code,
-                                        // bank_category: e.bank_category,
+                                        bank_code: e.id,
+                                        bank_category: 'DMB',
                                     };
                                     return [4 /*yield*/, bank_model_1.default.create(bankPayload)];
                                 case 1:
@@ -229,8 +231,8 @@ var BankController = /** @class */ (function () {
                                     case 0: return [4 /*yield*/, bank_model_1.default.updateMany({ name: e.bankname }, {
                                             $setOnInsert: {
                                                 name: e.bankname,
-                                                // bank_code: e.bank_code,
-                                                // bank_category: e.bank_category,
+                                                bank_code: e.id,
+                                                bank_category: 'DMB',
                                             },
                                         }, { upsert: true })];
                                     case 1:
@@ -255,8 +257,8 @@ var BankController = /** @class */ (function () {
                                 case 0:
                                     bankPayload = {
                                         name: e.bankname,
-                                        // bank_code: e.bank_code,
-                                        // bank_category: e.bank_category,
+                                        bank_code: e.id,
+                                        bank_category: 'DMB',
                                     };
                                     return [4 /*yield*/, bank_model_1.default.create(bankPayload)];
                                 case 1:
@@ -287,7 +289,7 @@ var BankController = /** @class */ (function () {
 }());
 exports.default = BankController;
 // Bank Cron Job
-node_cron_1.default.schedule(String(process.env.CRON), function () { return __awaiter(void 0, void 0, void 0, function () {
+node_cron_1.default.schedule(String(process.env.NIBSS_CRON), function () { return __awaiter(void 0, void 0, void 0, function () {
     return __generator(this, function (_b) {
         BankController.bankListPipelinePos();
         BankController.bankListPipelineNip();
